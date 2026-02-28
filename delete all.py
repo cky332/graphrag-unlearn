@@ -57,16 +57,16 @@ async def main():
 
     try:
         # ======== 预验证 ========
-        logger.info(f"正在验证实体 ‘{raw_node_id_default}’ 是否存在...")
+        logger.info(f"正在验证实体 '{raw_node_id_default}' 是否存在...")
         try:
             entity_info = validate_entity_exists(graphml_path, raw_node_id_default)
             logger.info(
-                f"实体已找到: 连接边数={entity_info[‘edge_count’]}, "
-                f"描述={entity_info[‘description’][:50]}..."
+                f"实体已找到: 连接边数={entity_info['edge_count']}, "
+                f"描述={entity_info['description'][:50]}..."
             )
         except EntityNotFoundError:
             logger.warning(
-                f"实体 ‘{raw_node_id_default}’ 不直接存在于图中，"
+                f"实体 '{raw_node_id_default}' 不直接存在于图中，"
                 "将通过模糊匹配和 RAG 提取关联实体..."
             )
 
@@ -82,14 +82,14 @@ async def main():
 
         # ======== 交互确认 ========
         if not args.yes:
-            print(f"\n{‘=’*60}")
+            print(f"\n{'='*60}")
             print("删除预览")
-            print(f"{‘=’*60}")
+            print(f"{'='*60}")
             print(f"目标实体: {raw_node_id_default}")
             print(f"将处理的关联实体 ({len(entities)} 个):")
             for e in entities:
                 print(f"  - {e}")
-            print(f"{‘=’*60}")
+            print(f"{'='*60}")
             confirm = input("确认执行删除操作？(y/N): ").strip().lower()
             if confirm != "y":
                 logger.info("用户取消了删除操作。")
@@ -108,7 +108,7 @@ async def main():
             logger.info(f"\n>>> 正在处理实体: {entity}")
 
             # Step 1: 更新 GraphML 描述
-            logger.info(f"--- Step 1: 匿名化描述 ‘{entity}’ ---")
+            logger.info(f"--- Step 1: 匿名化描述 '{entity}' ---")
             await update_graphml_descriptions(graphml_path, entity, raw_node_id_default)
 
             # Step 2: 匿名化文本块
@@ -132,7 +132,7 @@ async def main():
                 root = tree.getroot()
                 for node in root.findall(".//{*}node"):
                     node_id = node.get("id", "")
-                    if node_id.strip(‘"’) == entity:
+                    if node_id.strip('"') == entity:
                         for data in node.findall("{*}data"):
                             if data.get("key") == "d3":
                                 run_step3 = True
@@ -142,11 +142,11 @@ async def main():
                 logger.warning(f"检查社区数据时出错: {e}")
 
             if run_step3:
-                logger.info(f"--- Step 3: 执行社区删除流程 ‘{entity}’ ---")
+                logger.info(f"--- Step 3: 执行社区删除流程 '{entity}' ---")
                 await delete_community_pipeline(entity)
                 report.communities_updated += 1
             else:
-                logger.info(f"--- Step 3: 跳过（’{entity}’ 无社区数据）---")
+                logger.info(f"--- Step 3: 跳过（'{entity}' 无社区数据）---")
 
             # Step 4: 匿名化社区报告
             logger.info(f"--- Step 4: 匿名化社区报告 ---")

@@ -12,7 +12,7 @@
 import spacy
 from collections import Counter
 
-# 实体类型白名单（只保留这些类型，过滤掉“said”“said”等无意义词）
+# 实体类型白名单（只保留这些类型，过滤掉"said""said"等无意义词）
 VALID_LABELS = {
     'PERSON',        # 人名
     'ORG',           # 机构
@@ -63,7 +63,7 @@ def main():
 
     top_entities = get_top_n_entities(input_file, top_n)
 
-    print(f"在文件“{input_file}”中出现频率最高的 {top_n} 个有意义实体：")
+    print(f"在文件"{input_file}"中出现频率最高的 {top_n} 个有意义实体：")
     for rank, (ent, count) in enumerate(top_entities, start=1):
         print(f"{rank}. {ent} — {count} 次")
 

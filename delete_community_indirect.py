@@ -52,7 +52,7 @@ async def update_single_community_report(rag: GraphRAG, community_id: str, old_r
         global_config=config
     )
 
-    # 构建“前置清洗+过滤”指令
+    # 构建"前置清洗+过滤"指令
     forbid = FORBID_ENTITY
     if forbid:
         preamble = f"""
