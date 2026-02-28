@@ -6,10 +6,10 @@ import xml.etree.ElementTree as ET
 from delete_utils import clean_node_id, anonymize_text, get_logger
 
 # File paths for hop lists and GraphML
-ONE_HOP_FILE = ‘one_hop_nodes.txt’
-TWO_HOP_FILE = ‘two_hop_nodes.txt’
-THREE_HOP_FILE = ‘three_hop_nodes.txt’
-GRAPHML_FILE = os.path.join(‘cache’, ‘graph_chunk_entity_relation.graphml’)
+ONE_HOP_FILE = 'one_hop_nodes.txt'
+TWO_HOP_FILE = 'two_hop_nodes.txt'
+THREE_HOP_FILE = 'three_hop_nodes.txt'
+GRAPHML_FILE = os.path.join('cache', 'graph_chunk_entity_relation.graphml')
 
 logger = get_logger()
 

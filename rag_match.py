@@ -48,7 +48,7 @@ async def rag_and_alias_extraction(raw_node_id: str, gr: GraphRAG) -> list[str]:
     # 用更严格的英文 Prompt 调用 deepseek-v3，只返回逗号分隔的实体名称列表
     prompt = (
         f"Text:\n{combined_text}\n\n"
-        f"Task: Identify all unique proper names, aliases, or spelling variants that refer to “{raw_node_id}”.\n"
+        f'Task: Identify all unique proper names, aliases, or spelling variants that refer to "{raw_node_id}".\n'
         "Requirements:\n"
         "1. Output exactly one line: a comma-separated list of the names.\n"
         "2. Do NOT output any additional commentary, explanation, or punctuation.\n"

@@ -7,10 +7,10 @@ from delete_utils import anonymize_text, get_logger
 logger = get_logger()
 
 # Paths and constants
-CACHE_DIR = ‘cache’
-GRAPHML_FILE = os.path.join(CACHE_DIR, ‘graph_chunk_entity_relation.graphml’)
-HOP_FILES = [‘two_hop_nodes.txt’, ‘three_hop_nodes.txt’]
-COMMUNITY_REPORTS_FILE = os.path.join(CACHE_DIR, ‘kv_store_community_reports.json’)
+CACHE_DIR = 'cache'
+GRAPHML_FILE = os.path.join(CACHE_DIR, 'graph_chunk_entity_relation.graphml')
+HOP_FILES = ['two_hop_nodes.txt', 'three_hop_nodes.txt']
+COMMUNITY_REPORTS_FILE = os.path.join(CACHE_DIR, 'kv_store_community_reports.json')
 
 
 def update_reports_for_entity(raw_node_id_default: str) -> None:
