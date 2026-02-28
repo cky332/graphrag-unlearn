@@ -1,8 +1,6 @@
 
 import asyncio
-import json
 import traceback
-import subprocess
 import sys
 
 from delete_community_direct_node_edge import main as direct_main
@@ -13,6 +11,10 @@ from delete_generate_graphml import main as generate_graphml_main
 from delete_community_leiden import main as leiden_main
 from delete_community_unique import ensure_unique_ids
 from delete_community_merge import main as merge_main
+from delete_community_update_ndoe_cluster import main as update_node_cluster_main
+from delete_utils import get_logger
+
+logger = get_logger()
 
 # 配置常量
 CLUSTER_CHANGE_FLAGS = "cluster_change_flags.json"
@@ -33,55 +35,51 @@ async def delete_community_pipeline(raw_node_id: str):
       9) 合并更新后的社区报告
      10) 更新 GraphML 节点-社区映射
     """
-    print(f"[DC] 1) 删除节点/边: {raw_node_id}")
+    logger.info(f"[DC] 1) 删除节点/边: {raw_node_id}")
     direct_main(raw_node_id)
 
-    print(f"[DC] 2) 异步更新报告 (禁止实体: {raw_node_id})")
-    # 把 raw_node_id 作为 forbid_entity 传给 update_main
+    logger.info(f"[DC] 2) 异步更新报告 (禁止实体: {raw_node_id})")
     await update_main(raw_node_id)
 
-    print(f"[DC] 3) 异步剪枝间接边: {raw_node_id}")
+    logger.info(f"[DC] 3) 异步剪枝间接边: {raw_node_id}")
     await prune_edges_for_node(raw_node_id)
 
-    print(f"[DC] 4) 同步评估社区结构变化")
+    logger.info(f"[DC] 4) 同步评估社区结构变化")
     changed = evaluate_main()
 
     if not changed:
-        print(f"[DC] 未检测到变化，跳过后续步骤")
+        logger.info("[DC] 未检测到变化，跳过后续步骤")
         return
 
-    print(f"[DC] 6) 生成子图")
+    logger.info("[DC] 6) 生成子图")
     generate_graphml_main()
 
-    print(f"[DC] 7) Leiden 聚类与报告")
+    logger.info("[DC] 7) Leiden 聚类与报告")
     try:
         await leiden_main()
     except Exception as e:
-        print(f"[DC][WARN] Leiden 失败，跳过后续: {e}")
+        logger.warning(f"[DC] Leiden 失败，跳过后续: {e}")
         traceback.print_exc()
         return
 
-    print(f"[DC] 8) 确保社区 ID 唯一")
+    logger.info("[DC] 8) 确保社区 ID 唯一")
     ensure_unique_ids(
         base_file=BASE_REPORTS_FILE,
         new_file=NEW_REPORTS_FILE,
     )
 
-    print(f"[DC] 9) 合并更新后的社区报告")
+    logger.info("[DC] 9) 合并更新后的社区报告")
     merge_main()
 
-    print(f"[DC] 10) 更新 GraphML 节点-社区映射")
+    logger.info("[DC] 10) 更新 GraphML 节点-社区映射")
     try:
-        subprocess.run(
-            ["python3", "delete_community_update_ndoe_cluster.py"],
-            check=True
-        )
-    except subprocess.CalledProcessError as e:
-        print(f"[DC][WARN] 更新映射失败: {e}")
+        update_node_cluster_main()
+    except Exception as e:
+        logger.warning(f"[DC] 更新映射失败: {e}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("用法: python delete_community.py <raw_node_id>")
+        logger.error("用法: python delete_community.py <raw_node_id>")
         sys.exit(1)
 
     node_id = sys.argv[1]

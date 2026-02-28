@@ -7,17 +7,17 @@ import sys
 from nano_graphrag.graphrag import GraphRAG
 from nano_graphrag._op import _pack_single_community_describe, _community_report_json_to_str
 from nano_graphrag.prompt import PROMPTS
+from delete_utils import get_logger, load_api_config
+
+logger = get_logger()
 
 # 全局存储旧的社区报告数据
 OLD_REPORTS: dict = {}
 # 全局禁止实体名称（由 delete_community.py 传入）
 FORBID_ENTITY: str = ""
 
-# 配置环境变量
-os.environ["OPENAI_API_KEY"]   = "sk-zk20d46549ec2e0e53b3d943323d2f87fd0681ca5c69cd6a"
-os.environ["OPENAI_BASE_URL"]  = "https://api.zhizengzeng.com/v1/"
-os.environ["HTTP_PROXY"]       = "http://127.0.0.1:7890"
-os.environ["HTTPS_PROXY"]      = "http://127.0.0.1:7890"
+# 从环境变量或 .env 文件加载 API 配置
+load_api_config()
 
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -50,7 +50,7 @@ async def update_single_community_report(rag: GraphRAG, community_id: str):
             'report_json': {}
         }
         await community_report_kv.upsert({community_id: new_data})
-        print(f"INFO: 社区 {community_id} 节点为空，仅清空报告字段。")
+        logger.info(f"INFO: 社区 {community_id} 节点为空，仅清空报告字段。")
         return
 
     # 打包社区描述（未做额外过滤）

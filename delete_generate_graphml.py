@@ -4,6 +4,9 @@
 import json
 import copy
 import xml.etree.ElementTree as ET
+from delete_utils import get_logger
+
+logger = get_logger()
 
 # ———————— 配置区 ————————
 DELETED_JSON     = "deleted_clusters_cache.json"
@@ -21,32 +24,32 @@ ET.register_namespace('xsi', NS['xsi'])
 # ——————————————————————
 
 def load_deleted_level0(path):
-    print(f"[DEBUG] Loading deleted clusters from: {path}")
+    logger.info(f"[DEBUG] Loading deleted clusters from: {path}")
     with open(path, encoding='utf-8') as f:
         data = json.load(f)
     if isinstance(data, list) and all(isinstance(x, str) for x in data):
-        print(f"[DEBUG] Found simple list of cluster IDs: {data}")
+        logger.info(f"[DEBUG] Found simple list of cluster IDs: {data}")
         return set(data)
     level0_ids = []
     if isinstance(data, list):
-        print("[DEBUG] Found list of dicts, scanning for level==0 entries")
+        logger.info("[DEBUG] Found list of dicts, scanning for level==0 entries")
         for item in data:
             if isinstance(item, dict) and item.get('level') == 0 and 'cluster' in item:
                 level0_ids.append(str(item['cluster']))
-        print(f"[DEBUG] Extracted level-0 clusters: {level0_ids}")
+        logger.info(f"[DEBUG] Extracted level-0 clusters: {level0_ids}")
         return set(level0_ids)
     if isinstance(data, dict):
-        print("[DEBUG] Found dict mapping cluster_id -> info, scanning for level==0")
+        logger.info("[DEBUG] Found dict mapping cluster_id -> info, scanning for level==0")
         for cid, info in data.items():
             if isinstance(info, dict) and info.get('level') == 0:
                 level0_ids.append(str(cid))
-        print(f"[DEBUG] Extracted level-0 clusters: {level0_ids}")
+        logger.info(f"[DEBUG] Extracted level-0 clusters: {level0_ids}")
         return set(level0_ids)
-    print("[DEBUG] Unrecognized format for deleted_clusters, returning empty set")
+    logger.info("[DEBUG] Unrecognized format for deleted_clusters, returning empty set")
     return set()
 
 def load_reports_nodes_edges(path, cluster_ids):
-    print(f"[DEBUG] Loading community report from: {path}")
+    logger.info(f"[DEBUG] Loading community report from: {path}")
     with open(path, encoding='utf-8') as f:
         reports = json.load(f)
     nodes = set()
@@ -54,23 +57,23 @@ def load_reports_nodes_edges(path, cluster_ids):
     for cid in cluster_ids:
         rep = reports.get(str(cid))
         if not rep:
-            print(f"[WARN] Cluster ID {cid} not found in reports")
+            logger.info(f"[WARN] Cluster ID {cid} not found in reports")
             continue
-        print(f"[DEBUG] Cluster {cid}: {len(rep.get('nodes', []))} nodes, {len(rep.get('edges', []))} edges")
+        logger.info(f"[DEBUG] Cluster {cid}: {len(rep.get('nodes', []))} nodes, {len(rep.get('edges', []))} edges")
         nodes.update(rep.get('nodes', []))
         for e in rep.get('edges', []):
             edges.add((e[0], e[1]))
-    print(f"[DEBUG] Total nodes collected: {len(nodes)}; edges collected: {len(edges)}")
+    logger.info(f"[DEBUG] Total nodes collected: {len(nodes)}; edges collected: {len(edges)}")
     return nodes, edges
 
 def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
-    print(f"[DEBUG] Parsing GraphML input: {graphml_in}")
+    logger.info(f"[DEBUG] Parsing GraphML input: {graphml_in}")
     tree = ET.parse(graphml_in)
     root = tree.getroot()
 
     # 复制 <key> 定义
     key_elems = [copy.deepcopy(e) for e in root.findall(f'{{{NS["g"]}}}key')]
-    print(f"[DEBUG] Found {len(key_elems)} <key> elements")
+    logger.info(f"[DEBUG] Found {len(key_elems)} <key> elements")
 
     # 创建新的 root 和 graph
     new_root = ET.Element(root.tag, root.attrib)
@@ -86,11 +89,11 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
         nid = node.get('id')
         if nid in wanted_nodes:
             new_graph.append(copy.deepcopy(node))
-            print(f"[DEBUG] Added node: {repr(nid)}")
+            logger.info(f"[DEBUG] Added node: {repr(nid)}")
             added_nodes += 1
         else:
-            print(f"[TRACE] Skipped node: {repr(nid)}")
-    print(f"[DEBUG] Total nodes added: {added_nodes}")
+            logger.info(f"[TRACE] Skipped node: {repr(nid)}")
+    logger.info(f"[DEBUG] Total nodes added: {added_nodes}")
 
     # 添加边：同样从 <graph> 元素中查找
     added_edges = 0
@@ -99,37 +102,37 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
         tgt = edge.get('target')
         if (src, tgt) in wanted_edges:
             new_graph.append(copy.deepcopy(edge))
-            print(f"[DEBUG] Added edge: ({repr(src)} -> {repr(tgt)})")
+            logger.info(f"[DEBUG] Added edge: ({repr(src)} -> {repr(tgt)})")
             added_edges += 1
         else:
-            print(f"[TRACE] Skipped edge: ({repr(src)} -> {repr(tgt)})")
-    print(f"[DEBUG] Total edges added: {added_edges}")
+            logger.info(f"[TRACE] Skipped edge: ({repr(src)} -> {repr(tgt)})")
+    logger.info(f"[DEBUG] Total edges added: {added_edges}")
 
     return ET.ElementTree(new_root)
 
 def main():
     # 1. 找到 level=0 的社区
     level0 = load_deleted_level0(DELETED_JSON)
-    print(f"[DEBUG] Level-0 clusters to process: {level0}")
+    logger.info(f"[DEBUG] Level-0 clusters to process: {level0}")
     if not level0:
-        print("[ERROR] 未找到任何 level=0 的社区，退出。")
+        logger.info("[ERROR] 未找到任何 level=0 的社区，退出。")
         return
 
     # 2. 从报告中收集节点和边
     nodes, edges = load_reports_nodes_edges(REPORTS_JSON, level0)
     if not nodes and not edges:
-        print("[ERROR] 对应社区在报告中没有找到节点或边，退出。")
+        logger.info("[ERROR] 对应社区在报告中没有找到节点或边，退出。")
         return
 
     # 3. 提取子图并写入新文件
-    print("[INFO] 开始提取子图...")
+    logger.info("[INFO] 开始提取子图...")
     subgraph_tree = extract_subgraph(GRAPHML_IN, nodes, edges)
     subgraph_tree.write(
         GRAPHML_OUT,
         encoding='utf-8',
         xml_declaration=True
     )
-    print(f"[INFO] 成功生成子图文件: {GRAPHML_OUT}")
+    logger.info(f"[INFO] 成功生成子图文件: {GRAPHML_OUT}")
 
 if __name__ == "__main__":
     main()

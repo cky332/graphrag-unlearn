@@ -1,11 +1,9 @@
 import os
 import html
 import xml.etree.ElementTree as ET
-import os
-os.environ["OPENAI_API_KEY"]   = "sk-zk20d46549ec2e0e53b3d943323d2f87fd0681ca5c69cd6a"
-os.environ["OPENAI_BASE_URL"]  = "https://api.zhizengzeng.com/v1/"
-os.environ["HTTP_PROXY"]       = "http://127.0.0.1:7890"
-os.environ["HTTPS_PROXY"]      = "http://127.0.0.1:7890"
+from delete_utils import load_api_config
+
+load_api_config()
 def find_matching_nodes(graphml_path: str, raw_node_id: str):
     """
     从 GraphML 文件中查找所有节点 ID 中包含 raw_node_id（忽略大小写）的 <node> 元素。

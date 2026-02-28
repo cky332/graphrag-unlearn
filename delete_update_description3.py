@@ -1,22 +1,17 @@
 #!/usr/bin/env python3
 import os
 import asyncio
-import re
 import xml.etree.ElementTree as ET
 import sys
-from before_search import extract_entities  # 假设 extract_entities 已经正确导入
+from before_search import extract_entities
 from delete_node_edge import remove_node_and_edges
+from delete_utils import anonymize_text, get_logger
+
+logger = get_logger()
 
 # 在 Windows 上启用兼容的事件循环
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-
-def anonymize_text(text: str, pattern: str) -> str:
-    """
-    用 [mask] 替换 text 中所有不区分大小写的 pattern 出现。
-    """
-    return re.sub(re.escape(pattern), "[mask]", text, flags=re.IGNORECASE)
 
 
 async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_node_id2: str):

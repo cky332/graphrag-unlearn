@@ -1,12 +1,14 @@
 import os
 import json
-import html
 import xml.etree.ElementTree as ET
+from delete_utils import clean_node_id, get_logger
 
 # Paths (remain unchanged)
 GRAPHML_PATH = os.path.join("cache", "graph_chunk_entity_relation.graphml")
 COMMUNITY_REPORTS_PATH = os.path.join("cache", "kv_store_community_reports.json")
 DELETED_CACHE_PATH = "deleted_clusters_cache.json"
+
+logger = get_logger()
 
 
 def clean_id(raw: str) -> str:
@@ -14,10 +16,7 @@ def clean_id(raw: str) -> str:
     Unescape HTML entities, strip outer quotes, and lowercase.
     E.g. '&quot;DUMBLEDORE&quot;' → 'dumbledore'
     """
-    unesc = html.unescape(raw or "")
-    if unesc.startswith('"') and unesc.endswith('"'):
-        unesc = unesc[1:-1]
-    return unesc.strip().lower()
+    return clean_node_id(raw or "").strip().lower()
 
 
 def load_graphml_clusters(graphml_path: str, raw_node_id: str) -> list[str]:
@@ -131,7 +130,7 @@ def main(raw_node_id: str):
         community_reports_path=COMMUNITY_REPORTS_PATH
     )
 
-    print(f"Wrote {DELETED_CACHE_PATH} with clusters: {initial} for node {raw_node_id}")
+    logger.info(f"Wrote {DELETED_CACHE_PATH} with clusters: {initial} for node {raw_node_id}")
 
 if __name__ == "__main__":
     # Default behavior when run as script

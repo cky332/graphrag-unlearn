@@ -5,17 +5,15 @@ import os
 import html
 import asyncio
 import networkx as nx
+import sys
 
 from nano_graphrag.base import QueryParam
 from nano_graphrag.graphrag import GraphRAG
-from nano_graphrag._llm import deepseek_v3_complete  # 确保已在 _llm.py 中实现
-import os
-import sys
-# 配置环境变量
-os.environ["OPENAI_API_KEY"]   = "sk-zk20d46549ec2e0e53b3d943323d2f87fd0681ca5c69cd6a"
-os.environ["OPENAI_BASE_URL"]  = "https://api.zhizengzeng.com/v1/"
-os.environ["HTTP_PROXY"]       = "http://127.0.0.1:7890"
-os.environ["HTTPS_PROXY"]      = "http://127.0.0.1:7890"
+from nano_graphrag._llm import deepseek_v3_complete
+from delete_utils import load_api_config
+
+# 从环境变量或 .env 文件加载 API 配置
+load_api_config()
 
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

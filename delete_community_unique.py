@@ -3,6 +3,9 @@
 
 import json
 import os
+from delete_utils import get_logger
+
+logger = get_logger()
 
 def ensure_unique_ids(
     base_file: str,
@@ -63,7 +66,7 @@ def ensure_unique_ids(
     with open(new_file, "w", encoding="utf-8") as f:
         json.dump(unique_reports, f, ensure_ascii=False, indent=2)
 
-    print(f"Processed {len(new_reports)} communities, updated {new_file}")
+    logger.info(f"Processed {len(new_reports)} communities, updated {new_file}")
 
 if __name__ == "__main__":
     ensure_unique_ids(

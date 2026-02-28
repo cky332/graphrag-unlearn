@@ -1,20 +1,16 @@
 import os
 import asyncio
-import re
 import xml.etree.ElementTree as ET
 import sys
-from before_search import extract_entities  # 假设 extract_entities 已经正确导入
+from before_search import extract_entities
 from delete_node_edge import remove_node_and_edges
+from delete_utils import anonymize_text, get_logger
+
 # 在 Windows 上启用兼容的事件循环
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-
-def anonymize_text(text: str, pattern: str) -> str:
-    """
-    用 [mask] 替换 text 中所有不区分大小写的 pattern 出现。
-    """
-    return re.sub(re.escape(pattern), "[mask]", text, flags=re.IGNORECASE)
+logger = get_logger()
 
 
 async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_node_id2: str):
@@ -90,7 +86,7 @@ async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_n
 
     # 7. 写回文件
     tree.write(graphml_path, encoding="utf-8", xml_declaration=True)
-    print(f"Anonymized '{raw_node_id2}', its 1/2/3-hop neighbors and related edges in {graphml_path}")
+    logger.info(f"Anonymized '{raw_node_id2}', its 1/2/3-hop neighbors and related edges in {graphml_path}")
 
     # 8. 将一跳、二跳和三跳节点分别写入不同文件
     with open('one_hop_nodes.txt', 'w', encoding='utf-8') as f:
@@ -109,16 +105,16 @@ async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_n
 async def process_entities(graphml_path: str, raw_node_id: str):
     # 从 before_search 提取实体
     entities = await extract_entities(raw_node_id, graphml_path)
-    print(f"[Extracted Entities] 共 {len(entities)} 个：{entities}")
+    logger.info(f"[Extracted Entities] 共 {len(entities)} 个：{entities}")
 
     # 对每个提取的实体进行处理
     for entity in entities:
-        print(f"\n>>> Processing entity: {entity}")
+        logger.info(f">>> Processing entity: {entity}")
         # 调用 update_graphml_descriptions 处理每个实体
         await update_graphml_descriptions(graphml_path, entity, raw_node_id)
 
         remove_node_and_edges(graphml_path, entity)
-        print(f"[Done] Removed node & edges for '{entity}'.")
+        logger.info(f"[Done] Removed node & edges for '{entity}'.")
 
 
 if __name__ == "__main__":

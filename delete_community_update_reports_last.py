@@ -1,22 +1,16 @@
 import os
 import json
-import re
-import html
+import sys
 import xml.etree.ElementTree as ET
-import  sys
+from delete_utils import anonymize_text, get_logger
+
+logger = get_logger()
+
 # Paths and constants
-CACHE_DIR = 'cache'
-GRAPHML_FILE = os.path.join(CACHE_DIR, 'graph_chunk_entity_relation.graphml')
-HOP_FILES = ['two_hop_nodes.txt', 'three_hop_nodes.txt']
-COMMUNITY_REPORTS_FILE = os.path.join(CACHE_DIR, 'kv_store_community_reports.json')
-
-
-def anonymize_text(text: str, raw_node_id: str) -> str:
-    """
-    Replace all occurrences of raw_node_id in text (case-insensitive) with [mask].
-    """
-    pattern = re.compile(rf"\b{re.escape(raw_node_id)}(?:['’]s)?\b", re.IGNORECASE)
-    return pattern.sub('[mask]', text)
+CACHE_DIR = ‘cache’
+GRAPHML_FILE = os.path.join(CACHE_DIR, ‘graph_chunk_entity_relation.graphml’)
+HOP_FILES = [‘two_hop_nodes.txt’, ‘three_hop_nodes.txt’]
+COMMUNITY_REPORTS_FILE = os.path.join(CACHE_DIR, ‘kv_store_community_reports.json’)
 
 
 def update_reports_for_entity(raw_node_id_default: str) -> None:
@@ -37,7 +31,7 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
                         entities.add(val)
 
     if not entities:
-        print("No hop nodes found.")
+        logger.info("No hop nodes found.")
         return
 
     # 2. Parse GraphML and collect cluster ids
@@ -59,7 +53,7 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
                     continue
 
     if not cluster_ids:
-        print("No cluster IDs found for given entities.")
+        logger.info("No cluster IDs found for given entities.")
         return
 
     # 3. Load community reports
@@ -100,16 +94,16 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
 
             community['report_json'] = recurse(report_json)
             reports[cid] = community
-            print(f"Anonymized community report for cluster {cid}.")
+            logger.info(f"Anonymized community report for cluster {cid}.")
             updated = True
 
     # 5. Save changes if any
     if updated:
         with open(COMMUNITY_REPORTS_FILE, 'w', encoding='utf-8') as f:
             json.dump(reports, f, ensure_ascii=False, indent=2)
-        print("Community reports updated and saved.")
+        logger.info("Community reports updated and saved.")
     else:
-        print("No community reports required anonymization.")
+        logger.info("No community reports required anonymization.")
 
 
 if __name__ == '__main__':

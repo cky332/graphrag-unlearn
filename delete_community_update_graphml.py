@@ -3,6 +3,9 @@
 
 import copy
 import xml.etree.ElementTree as ET
+from delete_utils import get_logger
+
+logger = get_logger()
 
 # ———————— 配置区 ————————
 GRAPHML2_IN     = "graph_chunk_entity_relation2.graphml"
@@ -38,10 +41,10 @@ def main():
 
     # 找出缺失的节点 ID
     missing = referenced - existing_nodes
-    print(f"[DEBUG] Referenced nodes: {len(referenced)}, existing nodes: {len(existing_nodes)}, missing: {missing}")
+    logger.info(f"[DEBUG] Referenced nodes: {len(referenced)}, existing nodes: {len(existing_nodes)}, missing: {missing}")
 
     if not missing:
-        print("[INFO] 无缺失节点，直接复制为第三版文件。")
+        logger.info("[INFO] 无缺失节点，直接复制为第三版文件。")
         tree2.write(GRAPHML3_OUT, encoding='utf-8', xml_declaration=True)
         return
 
@@ -55,14 +58,14 @@ def main():
         nid = node.get('id')
         if nid in missing:
             graph2.append(copy.deepcopy(node))
-            print(f"[DEBUG] Added missing node: {repr(nid)}")
+            logger.info(f"[DEBUG] Added missing node: {repr(nid)}")
             added += 1
 
-    print(f"[INFO] 共添加 {added} 个缺失节点到第二版子图中。")
+    logger.info(f"[INFO] 共添加 {added} 个缺失节点到第二版子图中。")
 
     # 3. 输出合并后的第三版 GraphML
     tree2.write(GRAPHML3_OUT, encoding='utf-8', xml_declaration=True)
-    print(f"[INFO] 成功生成完整文件: {GRAPHML3_OUT}")
+    logger.info(f"[INFO] 成功生成完整文件: {GRAPHML3_OUT}")
 
 if __name__ == "__main__":
     main()
