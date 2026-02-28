@@ -19,24 +19,21 @@ async def extract_entities(raw_node_id: str, graphml_path: str) -> list[str]:
     fuzz_matches = find_matching_nodes(graphml_path, raw_node_id)
     fuzz_entities = [node_id for node_id, _xml in fuzz_matches]
 
-    # 2. RAG + DeepSeek-v3（需要 OPENAI_API_KEY，未设置时跳过）
-    rag_entities = []
+    # 2. RAG + DeepSeek-v3
     if not os.environ.get("OPENAI_API_KEY"):
-        import logging
-        logging.getLogger("graphrag-delete").warning(
-            "OPENAI_API_KEY 未设置，跳过 RAG 别名提取，仅使用模糊匹配结果"
-        )
-    else:
-        gr = GraphRAG(
-            working_dir=os.path.dirname(graphml_path),
-            enable_local=True,
-            enable_naive_rag=True,
-        )
-        try:
-            rag_entities = await rag_and_alias_extraction(raw_node_id, gr)
-        finally:
-            if hasattr(gr, "async_driver"):
-                await gr.async_driver.close()
+        raise RuntimeError("环境变量 OPENAI_API_KEY 未设置，请在 .env 文件或系统环境变量中配置后重试")
+
+    rag_entities = []
+    gr = GraphRAG(
+        working_dir=os.path.dirname(graphml_path),
+        enable_local=True,
+        enable_naive_rag=True,
+    )
+    try:
+        rag_entities = await rag_and_alias_extraction(raw_node_id, gr)
+    finally:
+        if hasattr(gr, "async_driver"):
+            await gr.async_driver.close()
 
     # 3. 在 GraphML 中校验 RAG 实体存在性
     graph = nx.read_graphml(graphml_path)

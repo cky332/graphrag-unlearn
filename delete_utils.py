@@ -132,7 +132,7 @@ def load_api_config(env_file: str = ".env") -> None:
                     os.environ.setdefault(key.strip(), value.strip())
 
     if "OPENAI_API_KEY" not in os.environ:
-        logger.warning("环境变量 OPENAI_API_KEY 未设置，LLM 相关操作可能失败")
+        raise RuntimeError("环境变量 OPENAI_API_KEY 未设置，请在 .env 文件或系统环境变量中配置后重试")
 
 
 # ============== 预验证 ==============
