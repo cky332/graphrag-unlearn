@@ -3,9 +3,22 @@
 test_cache.json
 run_test*.py
 nano_graphrag_cache*/
-*.txt
 examples/benchmarks/fixtures/
 tests/original_workflow.txt
+
+# 删除流程临时文件
+one_hop_nodes.txt
+two_hop_nodes.txt
+three_hop_nodes.txt
+deleted_clusters_cache.json
+cluster_change_flags.json
+graph_chunk_entity_relation2.graphml
+graph_chunk_entity_relation3.graphml
+kv_store_community_reports3.json
+
+# 备份目录
+cache/.deletion_backups/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/

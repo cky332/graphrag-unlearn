@@ -1,0 +1,13 @@
+services:
+  graphrag-delete:
+    build: .
+    container_name: graphrag-delete
+    env_file:
+      - .env
+    volumes:
+      # 挂载缓存目录，持久化图数据
+      - ./cache:/app/cache
+    # 默认不自动启动，需手动运行删除命令
+    profiles:
+      - manual
+    # 示例: docker compose run graphrag-delete Benjamin --yes
