@@ -132,11 +132,14 @@ async def check_config():
 
     在提交删除任务前调用此端点，可提前发现配置问题。
     """
+    cwd_env = os.path.abspath(".env")
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    env_file = os.path.join(project_root, ".env")
+    root_env = os.path.join(project_root, ".env")
     return {
-        "env_file_path": env_file,
-        "env_file_exists": os.path.isfile(env_file),
+        "cwd_env_path": cwd_env,
+        "cwd_env_exists": os.path.isfile(cwd_env),
+        "project_root_env_path": root_env,
+        "project_root_env_exists": os.path.isfile(root_env),
         "openai_api_key_set": bool(os.environ.get("OPENAI_API_KEY")),
         "openai_base_url": os.environ.get("OPENAI_BASE_URL", "(未设置)"),
     }

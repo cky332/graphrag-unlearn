@@ -30,9 +30,19 @@ def _ensure_initialized():
     if _initialized:
         return
 
-    # .env 文件相对于项目根目录查找，而不是 CWD
+    # 优先从 CWD 加载 .env（与 delete all.py 行为一致），
+    # 找不到则 fallback 到项目根目录
+    cwd_env = os.path.abspath(".env")
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    env_file = os.path.join(project_root, ".env")
+    root_env = os.path.join(project_root, ".env")
+
+    if os.path.isfile(cwd_env):
+        env_file = cwd_env
+    elif os.path.isfile(root_env):
+        env_file = root_env
+    else:
+        env_file = cwd_env  # 让 load_api_config 报出具体路径
+
     logger.info(f"首次初始化：加载配置文件 {env_file}")
     load_api_config(env_file)
 
