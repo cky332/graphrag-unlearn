@@ -15,38 +15,30 @@ def find_matching_nodes(graphml_path: str, raw_node_id: str):
     Returns:
         List of tuples: (cleaned_id, node_xml_string)
     """
-    # 解析 XML
     tree = ET.parse(graphml_path)
     root = tree.getroot()
-    # GraphML 默认命名空间
     ns = {'g': 'http://graphml.graphdrawing.org/xmlns'}
 
     matches = []
-    # 递归地查找所有 <node> 元素（可能在 <graph> 之下）
     for node in root.findall('.//g:node', ns):
         id_attr = node.get('id')
         if not id_attr:
             continue
 
-        # xml.etree 已将 &quot; 解析为实际的双引号，这里做一次 html.unescape 以防万一
         id_unescaped = html.unescape(id_attr)
 
-        # 去除外层的双引号（如果存在）
         if id_unescaped.startswith('"') and id_unescaped.endswith('"'):
             id_clean = id_unescaped[1:-1]
         else:
             id_clean = id_unescaped
 
-        # 忽略大小写的模糊匹配
         if raw_node_id.lower() in id_clean.lower():
-            # 以字符串形式输出整个 <node> 元素
             node_xml = ET.tostring(node, encoding='unicode')
             matches.append((id_clean, node_xml))
 
     return matches
 
 def main():
-    # —— 直接指定 GraphML 路径和要匹配的 raw_node_id —— 
     graphml_file = os.path.join('cache', 'graph_chunk_entity_relation.graphml')
     raw_node_id = "Dumbledore"
 

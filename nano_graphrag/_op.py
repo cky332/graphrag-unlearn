@@ -46,7 +46,6 @@ def chunking_by_token_size(
             chunk_token.append(tokens[start : start + max_token_size])
             lengths.append(min(max_token_size, len(tokens) - start))
 
-        # here somehow tricky, since the whole chunk tokens is list[list[list[int]]] for corpus(doc(chunk)),so it can't be decode entirely
         chunk_token = tiktoken_model.decode_batch(chunk_token)
         for i, chunk in enumerate(chunk_token):
 
@@ -82,7 +81,6 @@ def chunking_by_seperators(
         chunk_token = splitter.split_tokens(tokens)
         lengths = [len(c) for c in chunk_token]
 
-        # here somehow tricky, since the whole chunk tokens is list[list[list[int]]] for corpus(doc(chunk)),so it can't be decode entirely
         chunk_token = tiktoken_model.decode_batch(chunk_token)
         for i, chunk in enumerate(chunk_token):
 
@@ -130,7 +128,7 @@ async def _handle_entity_relation_summary(
     summary_max_tokens = global_config["entity_summary_to_max_tokens"]
 
     tokens = encode_string_by_tiktoken(description, model_name=tiktoken_model_name)
-    if len(tokens) < summary_max_tokens:  # No need for summary
+    if len(tokens) < summary_max_tokens:
         return description
     prompt_template = PROMPTS["summarize_entity_descriptions"]
     use_description = decode_tokens_by_tiktoken(
@@ -152,7 +150,6 @@ async def _handle_single_entity_extraction(
 ):
     if len(record_attributes) < 4 or record_attributes[0] != '"entity"':
         return None
-    # add this record as a node in the G
     entity_name = clean_str(record_attributes[1].upper())
     if not entity_name.strip():
         return None
@@ -173,7 +170,6 @@ async def _handle_single_relationship_extraction(
 ):
     if len(record_attributes) < 5 or record_attributes[0] != '"relationship"':
         return None
-    # add this record as edge
     source = clean_str(record_attributes[1].upper())
     target = clean_str(record_attributes[2].upper())
     edge_description = clean_str(record_attributes[3])
@@ -257,7 +253,6 @@ async def _merge_edges_then_upsert(
         already_description.append(already_edge["description"])
         already_order.append(already_edge.get("order", 1))
 
-    # [numberchiffre]: `Relationship.order` is only returned from DSPy's predictions
     order = min([dp.get("order", 1) for dp in edges_data] + already_order)
     weight = sum([dp["weight"] for dp in edges_data] + already_weights)
     description = GRAPH_FIELD_SEP.join(
@@ -382,18 +377,16 @@ async def extract_entities(
         )
         return dict(maybe_nodes), dict(maybe_edges)
 
-    # use_llm_func is wrapped in ascynio.Semaphore, limiting max_async callings
     results = await asyncio.gather(
         *[_process_single_content(c) for c in ordered_chunks]
     )
-    print()  # clear the progress bar
+    print()
     maybe_nodes = defaultdict(list)
     maybe_edges = defaultdict(list)
     for m_nodes, m_edges in results:
         for k, v in m_nodes.items():
             maybe_nodes[k].extend(v)
         for k, v in m_edges.items():
-            # it's undirected graph
             maybe_edges[tuple(sorted(k))].extend(v)
     all_entities_data = await asyncio.gather(
         *[
@@ -427,7 +420,6 @@ def _pack_single_community_by_sub_communities(
     max_token_size: int,
     already_reports: dict[str, CommunitySchema],
 ) -> tuple[str, int]:
-    # TODO
     all_sub_communities = [
         already_reports[k] for k in community["sub_communities"] if k in already_reports
     ]
@@ -518,7 +510,6 @@ async def _pack_single_community_describe(
         edges_list_data
     ) > len(edges_may_truncate_list_data)
 
-    # If context is exceed the limit and have sub-communities:
     report_describe = ""
     need_to_use_sub_communities = (
         truncated and len(community["sub_communities"]) and len(already_reports)
@@ -547,7 +538,6 @@ async def _pack_single_community_describe(
         report_include_edges_list_data = [
             e for e in edges_list_data if (e[1], e[2]) in contain_edges
         ]
-        # if report size is bigger than max_token_size, nodes and edges are []
         nodes_may_truncate_list_data = truncate_list_by_token_size(
             report_exclude_nodes_list_data + report_include_nodes_list_data,
             key=lambda x: x[3],
@@ -672,7 +662,7 @@ async def generate_community_report(
                 )
             }
         )
-    print()  # clear the progress bar
+    print()
     await community_report_kv.upsert(community_datas)
 
 

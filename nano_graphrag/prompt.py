@@ -497,24 +497,19 @@ PROMPTS["fail_response"] = "Sorry, I'm not able to provide an answer to that que
 PROMPTS["process_tickers"] = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 PROMPTS["default_text_separator"] = [
-    # Paragraph separators
     "\n\n",
     "\r\n\r\n",
-    # Line breaks
     "\n",
     "\r\n",
-    # Sentence ending punctuation
-    "。",  # Chinese period
-    "．",  # Full-width dot
-    ".",  # English period
-    "！",  # Chinese exclamation mark
-    "!",  # English exclamation mark
-    "？",  # Chinese question mark
-    "?",  # English question mark
-    # Whitespace characters
-    " ",  # Space
-    "\t",  # Tab
-    "\u3000",  # Full-width space
-    # Special characters
-    "\u200b",  # Zero-width space (used in some Asian languages)
+    "。",
+    "．",
+    ".",
+    "！",
+    "!",
+    "？",
+    "?",
+    " ",
+    "\t",
+    "\u3000",
+    "\u200b",
 ]

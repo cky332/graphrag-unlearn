@@ -12,19 +12,18 @@
 import spacy
 from collections import Counter
 
-# 实体类型白名单（只保留这些类型，过滤掉"said""said"等无意义词）
 VALID_LABELS = {
-    'PERSON',        # 人名
-    'ORG',           # 机构
-    'GPE',           # 国家/城市/地点
-    'NORP',          # 民族/宗教/政治派别
-    'FAC',           # 建筑物/设施
-    'LOC',           # 地点
-    'PRODUCT',       # 产品
-    'EVENT',         # 事件
-    'WORK_OF_ART',   # 艺术作品
-    'LAW',           # 法律
-    'LANGUAGE'       # 语言
+    'PERSON',
+    'ORG',
+    'GPE',
+    'NORP',
+    'FAC',
+    'LOC',
+    'PRODUCT',
+    'EVENT',
+    'WORK_OF_ART',
+    'LAW',
+    'LANGUAGE'
 }
 
 def get_least_n_entities(file_path: str, n: int = 11,
@@ -36,18 +35,14 @@ def get_least_n_entities(file_path: str, n: int = 11,
     :param model_name: spaCy 模型名称
     :return: List of tuples [(entity_text, count), ...]，按出现次数从低到高排序
     """
-    # 加载 spaCy 模型
     nlp = spacy.load(model_name, disable=["tagger", "parser", "lemmatizer"])
     nlp.enable_pipe("ner")
 
-    # 读取全文
     with open(file_path, 'r', encoding='utf-8') as f:
         text = f.read()
 
-    # 分析文本
     doc = nlp(text)
 
-    # 筛选并统计实体
     entities = [
         ent.text.strip()
         for ent in doc.ents
@@ -55,7 +50,6 @@ def get_least_n_entities(file_path: str, n: int = 11,
     ]
     counter = Counter(entities)
 
-    # 按出现次数从低到高排序，并取前 n 个
     least_common = sorted(counter.items(), key=lambda x: x[1])[:n]
     return least_common
 

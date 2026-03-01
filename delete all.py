@@ -17,7 +17,6 @@ from delete_utils import (
     EntityNotFoundError,
 )
 
-# 尽早加载 .env 中的 API 配置，确保后续所有模块都能读到环境变量
 load_api_config()
 from delete_vdb_entities import delete_vdb_entities
 from before_search import extract_entities
@@ -60,7 +59,6 @@ async def main():
     backup_dir = None
 
     try:
-        # ======== 预验证 ========
         logger.info(f"正在验证实体 '{raw_node_id_default}' 是否存在...")
         try:
             entity_info = validate_entity_exists(graphml_path, raw_node_id_default)
@@ -74,7 +72,6 @@ async def main():
                 "将通过模糊匹配和 RAG 提取关联实体..."
             )
 
-        # ======== 提取关联实体 ========
         logger.info("Step 0: 提取关联实体...")
         entities = await extract_entities(raw_node_id_default, graphml_path)
         logger.info(f"共找到 {len(entities)} 个关联实体：{entities}")
@@ -84,7 +81,6 @@ async def main():
             logger.warning("未找到任何关联实体，删除流程终止。")
             return
 
-        # ======== 交互确认 ========
         if not args.yes:
             print(f"\n{'='*60}")
             print("删除预览")
@@ -99,7 +95,6 @@ async def main():
                 logger.info("用户取消了删除操作。")
                 return
 
-        # ======== 备份 ========
         if not args.no_backup:
             logger.info("正在创建备份...")
             backup_dir = create_backup(cache_dir, raw_node_id_default)
@@ -107,15 +102,12 @@ async def main():
         else:
             logger.warning("已跳过备份（--no-backup）")
 
-        # ======== 执行删除流程 ========
         for entity in entities:
             logger.info(f"\n>>> 正在处理实体: {entity}")
 
-            # Step 1: 更新 GraphML 描述
             logger.info(f"--- Step 1: 匿名化描述 '{entity}' ---")
             await update_graphml_descriptions(graphml_path, entity, raw_node_id_default)
 
-            # Step 2: 匿名化文本块
             logger.info(f"--- Step 2: 匿名化文本块 ---")
             try:
                 results = await anonymize_all_chunks(
@@ -129,7 +121,6 @@ async def main():
                 report.errors.append(f"文本块处理失败 ({entity}): {e}")
                 continue
 
-            # Step 3: 社区删除流程（仅当节点有社区数据时）
             run_step3 = False
             try:
                 tree = ET.parse(graphml_path)
@@ -152,17 +143,14 @@ async def main():
             else:
                 logger.info(f"--- Step 3: 跳过（'{entity}' 无社区数据）---")
 
-            # Step 4: 匿名化社区报告
             logger.info(f"--- Step 4: 匿名化社区报告 ---")
             update_reports_for_entity(raw_node_id_default)
 
-            # Step 5: 移除节点和边
             logger.info(f"--- Step 5: 移除节点和边 ---")
             n_nodes, n_edges = remove_node_and_edges(graphml_path, entity)
             report.nodes_removed += n_nodes
             report.edges_removed += n_edges
 
-            # Step 6: 从 VDB 中删除
             logger.info(f"--- Step 6: 从 VDB 中删除 ---")
             try:
                 n_vdb = delete_vdb_entities(entity, vdb_path)
@@ -171,7 +159,6 @@ async def main():
                 logger.warning(f"VDB 删除失败: {e}")
                 report.errors.append(f"VDB 删除失败 ({entity}): {e}")
 
-        # ======== 输出摘要报告 ========
         report.finalize()
         logger.info(report.summary())
 
@@ -185,7 +172,6 @@ async def main():
         raise
 
     finally:
-        # ======== 清理临时文件 ========
         cleanup_temp_files()
 
 

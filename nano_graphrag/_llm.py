@@ -155,7 +155,6 @@ def create_amazon_bedrock_complete_function(model_id: str) -> Callable:
             **kwargs
         )
     
-    # Set function name for easier debugging
     bedrock_complete.__name__ = f"{model_id}_complete"
     
     return bedrock_complete

@@ -8,7 +8,6 @@ from delete_utils import get_logger, load_json as _load_json
 
 logger = get_logger()
 
-# ———————— 配置区 ————————
 DELETED_CACHE = 'deleted_clusters_cache.json'
 REPORTS1      = os.path.join('cache',  'kv_store_community_reports.json')
 REPORTS2      = os.path.join('cache2', 'kv_store_community_reports.json')
@@ -17,7 +16,6 @@ FLAG_FILE     = 'cluster_change_flags.json'
 CLUSTERING_DELTA    = 0.1
 ASSORTATIVITY_DELTA = 0.1
 DENSITY_DELTA       = 0.05
-# ——————————————————————
 
 def load_json(path: str):
     logger.info(f"Loading JSON from {path!r}")
@@ -115,12 +113,10 @@ def main():
     changed = evaluate_clusters(deleted, reports1, reports2)
     logger.info(f"\n[FINAL] Overall changed = {changed}")
 
-    # 写入文件：仅 "true" 或 "false"
     with open(FLAG_FILE, 'w', encoding='utf-8') as f:
         f.write("true" if changed else "false")
     logger.info(f"[INFO] Wrote flag to {FLAG_FILE}: {'true' if changed else 'false'}")
 
-    # 最终控制台输出
     logger.info("true" if changed else "false")
 
 if __name__ == '__main__':

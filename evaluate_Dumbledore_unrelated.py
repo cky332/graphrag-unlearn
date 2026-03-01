@@ -4,7 +4,6 @@ from nano_graphrag.base import QueryParam
 import os
 import sys
 
-# 配置环境变量
 os.environ["OPENAI_API_KEY"] = "sk-zk20d46549ec2e0e53b3d943323d2f87fd0681ca5c69cd6a"
 os.environ["OPENAI_BASE_URL"] = "https://api.zhizengzeng.com/v1/"
 os.environ["HTTP_PROXY"] = "http://127.0.0.1:7890"
@@ -13,7 +12,6 @@ os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7890"
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-# 15 multiple-choice questions about Albus Dumbledore's Privet Drive arrival
 QUESTIONS = [
     {
         "text": (
@@ -123,24 +121,18 @@ QUESTIONS = [
 ]
 
 
-
 async def run_quiz():
-    # 初始化 GraphRAG
     graph = GraphRAG(working_dir="./cache")
     results = []
 
     for q in QUESTIONS:
         base_text = q["text"]
 
-        # 1) 检索并打印原始上下文
         context_prompt = (
             f"{base_text}\n"
         )
         context_param = QueryParam(mode="local", only_need_context=True)
         context = await graph.aquery(context_prompt, context_param)
-        # print(f"\n----- Context for question -----\n{base_text}\n")
-        # print(context)
-        # print("----- End of context -----\n")
 
         system_prompt = f"""
         You are a context-only QA assistant. You MUST use ONLY the text between <CONTEXT> tags below to answer the question. Do NOT use any external knowledge, pre-training, or guesswork.
@@ -156,8 +148,6 @@ async def run_quiz():
         - Do NOT output anything else.
         """
 
-        # —— 6. 调用 deepseek-v3 ——
-        # GraphRAG.best_model_func 默认即 deepseek_v3_complete（deepseek-v3）
         response = await graph.best_model_func(
             base_text,
             system_prompt=system_prompt
@@ -167,7 +157,6 @@ async def run_quiz():
         print(f"Predicted: {predicted}, Gold: {q['gold']}\n")
         results.append({"question": base_text, "predicted": predicted, "gold": q["gold"]})
 
-    # —— 7. 计算并输出准确率 ——
     correct = sum(1 for r in results if r["predicted"] == r["gold"])
     total = len(results)
     print(f"Accuracy: {correct}/{total} = {correct / total:.2%}")

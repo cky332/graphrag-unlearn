@@ -13,7 +13,6 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 
-# ============== 配置常量 ==============
 CACHE_DIR = "cache"
 GRAPHML_PATH = os.path.join(CACHE_DIR, "graph_chunk_entity_relation.graphml")
 VDB_PATH = os.path.join(CACHE_DIR, "vdb_entities.json")
@@ -39,7 +38,6 @@ BACKUP_FILES = [
 ]
 
 
-# ============== 自定义异常 ==============
 class DeletionError(Exception):
     """删除流程基础异常。"""
     pass
@@ -55,7 +53,6 @@ class DataFileError(DeletionError):
     pass
 
 
-# ============== 日志 ==============
 def get_logger(name: str = "graphrag-delete") -> logging.Logger:
     """获取统一的日志记录器。"""
     logger = logging.getLogger(name)
@@ -73,7 +70,6 @@ def get_logger(name: str = "graphrag-delete") -> logging.Logger:
 logger = get_logger()
 
 
-# ============== 工具函数 ==============
 def clean_node_id(raw: str) -> str:
     """还原 HTML 实体并去除外层双引号。
 
@@ -117,7 +113,6 @@ def save_json(path: str, data, indent: int = 2) -> None:
         json.dump(data, f, ensure_ascii=False, indent=indent)
 
 
-# ============== API 配置 ==============
 def load_api_config(env_file: str = ".env") -> None:
     """从 .env 文件或环境变量加载 API 配置。
 
@@ -135,7 +130,6 @@ def load_api_config(env_file: str = ".env") -> None:
         raise RuntimeError("环境变量 OPENAI_API_KEY 未设置，请在 .env 文件或系统环境变量中配置后重试")
 
 
-# ============== 预验证 ==============
 def validate_entity_exists(graphml_path: str, entity_name: str) -> dict:
     """检查实体是否存在于 GraphML 中。
 
@@ -151,15 +145,12 @@ def validate_entity_exists(graphml_path: str, entity_name: str) -> dict:
     root = tree.getroot()
     target = entity_name.strip().lower()
 
-    # 查找目标节点
     entity_info = None
     for node in root.findall(".//g:node", ns):
         nid = clean_node_id(node.get("id", ""))
         if nid.lower() == target:
-            # 获取描述
             desc_elem = node.find('g:data[@key="d1"]', ns)
             desc = (desc_elem.text or "")[:100] if desc_elem is not None else ""
-            # 获取社区
             cluster_elem = node.find('g:data[@key="d3"]', ns)
             clusters = cluster_elem.text if cluster_elem is not None else ""
             entity_info = {
@@ -174,7 +165,6 @@ def validate_entity_exists(graphml_path: str, entity_name: str) -> dict:
             f"实体 '{entity_name}' 在图中不存在: {graphml_path}"
         )
 
-    # 统计连接的边数
     edge_count = 0
     for edge in root.findall(".//g:edge", ns):
         src = clean_node_id(edge.get("source", "")).lower()
@@ -186,7 +176,6 @@ def validate_entity_exists(graphml_path: str, entity_name: str) -> dict:
     return entity_info
 
 
-# ============== 备份/恢复 ==============
 def create_backup(cache_dir: str, entity_name: str) -> str:
     """在删除前备份所有关键文件到 .deletion_backups/ 目录。
 
@@ -224,7 +213,6 @@ def restore_backup(backup_dir: str, cache_dir: str) -> None:
     logger.info(f"从备份恢复完成: {backup_dir}")
 
 
-# ============== 临时文件清理 ==============
 def cleanup_temp_files() -> None:
     """清理删除流程产生的临时文件。"""
     cleaned = 0
@@ -236,7 +224,6 @@ def cleanup_temp_files() -> None:
         logger.info(f"已清理 {cleaned} 个临时文件")
 
 
-# ============== 删除摘要报告 ==============
 @dataclass
 class DeletionReport:
     """删除操作的统计报告。"""

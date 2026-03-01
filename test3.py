@@ -10,7 +10,6 @@ from before_search import extract_entities
 from delete_update_description import update_graphml_descriptions
 from delete_node_edge import remove_node_and_edges
 from delete_community import delete_community_pipeline
-# Updated import: anonymize_all_chunks replaces process_text_chunks_for_node
 from delete_text_chunk import anonymize_all_chunks
 import xml.etree.ElementTree as ET
 
@@ -38,14 +37,12 @@ async def main():
     graphml_path = os.path.join(cache_dir, 'graph_chunk_entity_relation.graphml')
     kv_store_path = os.path.join(cache_dir, 'kv_store_text_chunks.json')
 
-    # Step 0: Extract related entities
     entities = await extract_entities(raw_node_id_default, graphml_path)
     print(f"[Extracted Entities] 共 {len(entities)} 个：{entities}")
 
     for entity in entities:
         print(f"\n>>> Processing entity: {entity}")
 
-        # Step 4: Remove node and edges
         remove_node_and_edges(graphml_path, entity)
         print(f"[Done] Removed node & edges for '{entity}'.")
 

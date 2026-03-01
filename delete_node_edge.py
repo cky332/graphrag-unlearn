@@ -8,10 +8,9 @@ ET.register_namespace('', 'http://graphml.graphdrawing.org/xmlns')
 
 logger = get_logger()
 
-# 文件路径和节点ID常量
 CACHE_GRAPHML = os.path.join("cache", "graph_chunk_entity_relation.graphml")
 RAW_NODE_ID = "Dumbledore"
-OUTPUT_PATH = None  # None 表示覆盖原文件
+OUTPUT_PATH = None
 
 
 def remove_node_and_edges(graphml_path: str, raw_node_id: str, output_path: str = None):
@@ -34,7 +33,6 @@ def remove_node_and_edges(graphml_path: str, raw_node_id: str, output_path: str 
         logger.error("<graph> element not found.")
         return 0, 0
 
-    # 1. 收集要删除的节点原始 id
     to_delete = set()
     for node in graph_elem.findall('g:node', ns):
         nid = node.get('id')
@@ -47,12 +45,10 @@ def remove_node_and_edges(graphml_path: str, raw_node_id: str, output_path: str 
 
     logger.info(f"Found node IDs to delete: {to_delete}")
 
-    # 2. 删除节点
     for node in list(graph_elem.findall('g:node', ns)):
         if node.get('id') in to_delete:
             graph_elem.remove(node)
 
-    # 3. 删除相关边
     removed_edges = 0
     for edge in list(graph_elem.findall('g:edge', ns)):
         src = edge.get('source')
@@ -62,7 +58,6 @@ def remove_node_and_edges(graphml_path: str, raw_node_id: str, output_path: str 
             graph_elem.remove(edge)
             removed_edges += 1
 
-    # 4. 写回文件
     tree.write(output_path, encoding='utf-8', xml_declaration=True)
     logger.info(f"Removed {len(to_delete)} node(s) and {removed_edges} edge(s).")
     logger.info(f"Updated GraphML written to: {output_path}")

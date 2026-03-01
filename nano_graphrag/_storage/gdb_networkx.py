@@ -40,7 +40,7 @@ class NetworkXStorage(BaseGraphStorage):
 
         graph = graph.copy()
         graph = cast(nx.Graph, largest_connected_component(graph))
-        node_mapping = {node: html.unescape(node.upper().strip()) for node in graph.nodes()}  # type: ignore
+        node_mapping = {node: html.unescape(node.upper().strip()) for node in graph.nodes()}
         graph = nx.relabel_nodes(graph, node_mapping)
         return NetworkXStorage._stabilize_graph(graph)
 
@@ -110,7 +110,6 @@ class NetworkXStorage(BaseGraphStorage):
         return await asyncio.gather(*[self.get_node(node_id) for node_id in node_ids])
 
     async def node_degree(self, node_id: str) -> int:
-        # [numberchiffre]: node_id not part of graph returns `DegreeView({})` instead of 0
         return self._graph.degree(node_id) if self._graph.has_node(node_id) else 0
 
     async def node_degrees_batch(self, node_ids: List[str]) -> List[str]:
@@ -207,7 +206,6 @@ class NetworkXStorage(BaseGraphStorage):
             next_level = ordered_levels[i + 1]
             this_level_comms = levels[curr_level]
             next_level_comms = levels[next_level]
-            # compute the sub-communities by nodes intersection
             for comm in this_level_comms:
                 results[comm]["sub_communities"] = [
                     c

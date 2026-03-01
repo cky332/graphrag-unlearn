@@ -16,7 +16,6 @@ from delete_utils import get_logger
 
 logger = get_logger()
 
-# 配置常量
 CLUSTER_CHANGE_FLAGS = "cluster_change_flags.json"
 BASE_REPORTS_FILE     = "cache/kv_store_community_reports.json"
 NEW_REPORTS_FILE      = "cache/kv_store_community_reports3.json"

@@ -6,7 +6,6 @@ from delete_utils import anonymize_text, get_logger
 
 logger = get_logger()
 
-# Paths and constants
 CACHE_DIR = 'cache'
 GRAPHML_FILE = os.path.join(CACHE_DIR, 'graph_chunk_entity_relation.graphml')
 HOP_FILES = ['two_hop_nodes.txt', 'three_hop_nodes.txt']
@@ -20,7 +19,6 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
     anonymize any occurrences of raw_node_id_default in both report_string and report_json.
     Save the updated community reports back to JSON.
     """
-    # 1. Load hop nodes
     entities = set()
     for fname in HOP_FILES:
         if os.path.exists(fname):
@@ -34,7 +32,6 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
         logger.info("No hop nodes found.")
         return
 
-    # 2. Parse GraphML and collect cluster ids
     ns = {'g': 'http://graphml.graphdrawing.org/xmlns'}
     tree = ET.parse(GRAPHML_FILE)
     root = tree.getroot()
@@ -47,7 +44,6 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
                 try:
                     clusters = json.loads(data_elem.text)
                     for c in clusters:
-                        # collect numeric cluster id as string key
                         cluster_ids.add(str(c.get('cluster')))
                 except json.JSONDecodeError:
                     continue
@@ -56,7 +52,6 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
         logger.info("No cluster IDs found for given entities.")
         return
 
-    # 3. Load community reports
     if not os.path.isfile(COMMUNITY_REPORTS_FILE):
         raise FileNotFoundError(f"Community reports file not found: {COMMUNITY_REPORTS_FILE}")
     with open(COMMUNITY_REPORTS_FILE, 'r', encoding='utf-8') as f:
@@ -65,23 +60,19 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
     updated = False
     raw_lower = raw_node_id_default.lower()
 
-    # 4. Process each cluster report
     for cid in cluster_ids:
         community = reports.get(cid)
         if not isinstance(community, dict):
             continue
 
-        # Combine existing content
         report_string = community.get('report_string', '')
         report_json = community.get('report_json', {})
         combined = (report_string or '').lower() + json.dumps(report_json or {}).lower()
 
         if raw_lower in combined:
-            # Anonymize report_string
             new_string = anonymize_text(report_string, raw_node_id_default)
             community['report_string'] = new_string
 
-            # Recursively anonymize all string fields in report_json
             def recurse(obj):
                 if isinstance(obj, str):
                     return anonymize_text(obj, raw_node_id_default)
@@ -97,7 +88,6 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
             logger.info(f"Anonymized community report for cluster {cid}.")
             updated = True
 
-    # 5. Save changes if any
     if updated:
         with open(COMMUNITY_REPORTS_FILE, 'w', encoding='utf-8') as f:
             json.dump(reports, f, ensure_ascii=False, indent=2)

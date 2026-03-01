@@ -31,43 +31,14 @@ class Neo4jStorage(BaseGraphStorage):
             self.neo4j_url, auth=self.neo4j_auth, max_connection_pool_size=50,      
         )
 
-    # async def create_database(self):
-    #     async with self.async_driver.session() as session:
-    #         try:
-    #             constraints = await session.run("SHOW CONSTRAINTS")
-    #             # TODO I don't know why CREATE CONSTRAINT IF NOT EXISTS still trigger error
-    #             # so have to check if the constrain exists
-    #             constrain_exists = False
-
-    #             async for record in constraints:
-    #                 if (
-    #                     self.namespace in record["labelsOrTypes"]
-    #                     and "id" in record["properties"]
-    #                     and record["type"] == "UNIQUENESS"
-    #                 ):
-    #                     constrain_exists = True
-    #                     break
-    #             if not constrain_exists:
-    #                 await session.run(
-    #                     f"CREATE CONSTRAINT FOR (n:{self.namespace}) REQUIRE n.id IS UNIQUE"
-    #                 )
-    #                 logger.info(f"Add constraint for namespace: {self.namespace}")
-
-    #         except Exception as e:
-    #             logger.error(f"Error accessing or setting up the database: {str(e)}")
-    #             raise
-
     async def _init_workspace(self):
         await self.async_driver.verify_authentication()
         await self.async_driver.verify_connectivity()
-        # TODOLater: create database if not exists always cause an error when async
-        # await self.create_database()
 
     async def index_start_callback(self):
         logger.info("Init Neo4j workspace")
         await self._init_workspace()
         
-        # create index for faster searching
         try:
             async with self.async_driver.session() as session:
                 await session.run(
@@ -182,7 +153,6 @@ class Neo4jStorage(BaseGraphStorage):
                     tgt_id = record["tgt_id"]
                     degree = record["degree"]
                     
-                    # 更新结果字典
                     edge_pair = (src_id, tgt_id)
                     result_dict[edge_pair] = degree
             
@@ -394,7 +364,6 @@ class Neo4jStorage(BaseGraphStorage):
         max_level = self.global_config["max_graph_cluster_size"]
         async with self.async_driver.session() as session:
             try:
-                # Project the graph with undirected relationships
                 await session.run(
                     f"""
                     CALL gds.graph.project(
@@ -410,7 +379,6 @@ class Neo4jStorage(BaseGraphStorage):
                     """
                 )
 
-                # Run Leiden algorithm
                 result = await session.run(
                     f"""
                     CALL gds.leiden.write(
@@ -436,7 +404,6 @@ class Neo4jStorage(BaseGraphStorage):
                     f"Performed graph clustering with {community_count} communities and modularities {modularities}"
                 )
             finally:
-                # Drop the projected graph
                 await session.run(f"CALL gds.graph.drop('graph_{self.namespace}')")
 
     async def community_schema(self) -> dict[str, SingleCommunitySchema]:
@@ -453,7 +420,6 @@ class Neo4jStorage(BaseGraphStorage):
         )
 
         async with self.async_driver.session() as session:
-            # Fetch community data
             result = await session.run(
                 f"""
                 MATCH (n:`{self.namespace}`)
@@ -463,8 +429,6 @@ class Neo4jStorage(BaseGraphStorage):
                        connected_nodes
                 """
             )
-
-            # records = await result.fetch()
 
             max_num_ids = 0
             async for record in result:
@@ -491,14 +455,12 @@ class Neo4jStorage(BaseGraphStorage):
                         max_num_ids, len(results[cluster_key]["chunk_ids"])
                     )
 
-            # Process results
             for k, v in results.items():
                 v["edges"] = [list(e) for e in v["edges"]]
                 v["nodes"] = list(v["nodes"])
                 v["chunk_ids"] = list(v["chunk_ids"])
                 v["occurrence"] = len(v["chunk_ids"]) / max_num_ids
 
-            # Compute sub-communities (this is a simplified approach)
             for cluster in results.values():
                 cluster["sub_communities"] = [
                     sub_key
@@ -515,10 +477,8 @@ class Neo4jStorage(BaseGraphStorage):
     async def _debug_delete_all_node_edges(self):
         async with self.async_driver.session() as session:
             try:
-                # Delete all relationships in the namespace
                 await session.run(f"MATCH (n:`{self.namespace}`)-[r]-() DELETE r")
 
-                # Delete all nodes in the namespace
                 await session.run(f"MATCH (n:`{self.namespace}`) DELETE n")
 
                 logger.info(

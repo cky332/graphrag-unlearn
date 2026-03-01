@@ -55,11 +55,9 @@ class GraphRAG:
     working_dir: str = field(
         default_factory=lambda: f"./nano_graphrag_cache_{datetime.now().strftime('%Y-%m-%d-%H:%M:%S')}"
     )
-    # graph mode
     enable_local: bool = True
     enable_naive_rag: bool = False
 
-    # text chunking
     chunk_func: Callable[
         [
             list[list[int]],
@@ -74,16 +72,13 @@ class GraphRAG:
     chunk_overlap_token_size: int = 100
     tiktoken_model_name: str = "gpt-4o"
 
-    # entity extraction
     entity_extract_max_gleaning: int = 1
     entity_summary_to_max_tokens: int = 500
 
-    # graph clustering
     graph_cluster_algorithm: str = "leiden"
     max_graph_cluster_size: int = 10
     graph_cluster_seed: int = 0xDEADBEEF
 
-    # node embedding
     node_embedding_algorithm: str = "node2vec"
     node2vec_params: dict = field(
         default_factory=lambda: {
@@ -97,18 +92,15 @@ class GraphRAG:
         }
     )
 
-    # community reports
     special_community_report_llm_kwargs: dict = field(
         default_factory=lambda: {"response_format": {"type": "json_object"}}
     )
 
-    # text embedding
     embedding_func: EmbeddingFunc = field(default_factory=lambda: openai_embedding)
     embedding_batch_num: int = 32
     embedding_func_max_async: int = 16
     query_better_than_threshold: float = 0.2
 
-    # LLM
     using_azure_openai: bool = False
     using_amazon_bedrock: bool = False
     best_model_id: str = "us.anthropic.claude-3-sonnet-20240229-v1:0"
@@ -120,17 +112,14 @@ class GraphRAG:
     cheap_model_max_token_size: int = 32768
     cheap_model_max_async: int = 16
 
-    # entity extraction
     entity_extraction_func: callable = extract_entities
 
-    # storage
     key_string_value_json_storage_cls: Type[BaseKVStorage] = JsonKVStorage
     vector_db_storage_cls: Type[BaseVectorStorage] = NanoVectorDBStorage
     vector_db_storage_cls_kwargs: dict = field(default_factory=dict)
     graph_storage_cls: Type[BaseGraphStorage] = NetworkXStorage
     enable_llm_cache: bool = True
 
-    # extension
     always_create_working_dir: bool = True
     addon_params: dict = field(default_factory=dict)
     convert_response_to_json_func: callable = convert_response_to_json
@@ -140,7 +129,6 @@ class GraphRAG:
         logger.debug(f"GraphRAG init with param:\n\n  {_print_config}\n")
 
         if self.using_azure_openai:
-            # If there's no OpenAI API key, use Azure OpenAI
             if self.best_model_func == gpt_4o_complete:
                 self.best_model_func = azure_gpt_4o_complete
             if self.cheap_model_func == gpt_4o_mini_complete:
@@ -267,7 +255,6 @@ class GraphRAG:
         try:
             if isinstance(string_or_strings, str):
                 string_or_strings = [string_or_strings]
-            # ---------- new docs
             new_docs = {
                 compute_mdhash_id(c.strip(), prefix="doc-"): {"content": c.strip()}
                 for c in string_or_strings
@@ -278,8 +265,6 @@ class GraphRAG:
                 logger.warning(f"All docs are already in the storage")
                 return
             logger.info(f"[New Docs] inserting {len(new_docs)} docs")
-
-            # ---------- chunking
 
             inserting_chunks = get_chunks(
                 new_docs=new_docs,
@@ -302,10 +287,8 @@ class GraphRAG:
                 logger.info("Insert chunks for naive RAG")
                 await self.chunks_vdb.upsert(inserting_chunks)
 
-            # TODO: no incremental update for communities now, so just drop all
             await self.community_reports.drop()
 
-            # ---------- extract/summary entity and upsert to graph
             logger.info("[Entity Extraction]...")
             maybe_new_kg = await self.entity_extraction_func(
                 inserting_chunks,
@@ -318,7 +301,6 @@ class GraphRAG:
                 logger.warning("No new entities found")
                 return
             self.chunk_entity_relation_graph = maybe_new_kg
-            # ---------- update clusterings of graph
             logger.info("[Community Report]...")
             await self.chunk_entity_relation_graph.clustering(
                 self.graph_cluster_algorithm
@@ -327,7 +309,6 @@ class GraphRAG:
                 self.community_reports, self.chunk_entity_relation_graph, asdict(self)
             )
 
-            # ---------- commit upsertings and indexing
             await self.full_docs.upsert(new_docs)
             await self.text_chunks.upsert(inserting_chunks)
         finally:

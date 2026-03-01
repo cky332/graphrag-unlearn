@@ -19,10 +19,8 @@ ENCODER = None
 
 def always_get_an_event_loop() -> asyncio.AbstractEventLoop:
     try:
-        # If there is already an event loop, use it.
         loop = asyncio.get_event_loop()
     except RuntimeError:
-        # If in a sub-thread, create a new event loop.
         logger.info("Creating a new event loop in a sub-thread.")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -45,7 +43,6 @@ def extract_first_complete_json(s: str):
                 if not stack:
                     first_json_str = s[first_json_start:i+1]
                     try:
-                        # Attempt to parse the JSON string
                         return json.loads(first_json_str.replace("\n", ""))
                     except json.JSONDecodeError as e:
                         logger.error(f"JSON decoding failed: {e}. Attempted string: {first_json_str[:50]}...")
@@ -66,32 +63,27 @@ def parse_value(value: str):
     elif value == "false":
         return False
     else:
-        # Try to convert to int or float
         try:
-            if '.' in value:  # If there's a dot, it might be a float
+            if '.' in value:
                 return float(value)
             else:
                 return int(value)
         except ValueError:
-            # If conversion fails, return the value as-is (likely a string)
-            return value.strip('"')  # Remove surrounding quotes if they exist
+            return value.strip('"')
 
 def extract_values_from_json(json_string, keys=["reasoning", "answer", "data"], allow_no_quotes=False):
     """Extract key values from a non-standard or malformed JSON string, handling nested objects."""
     extracted_values = {}
     
-    # Enhanced pattern to match both quoted and unquoted values, as well as nested objects
     regex_pattern = r'(?P<key>"?\w+"?)\s*:\s*(?P<value>{[^}]*}|".*?"|[^,}]+)'
     
     for match in re.finditer(regex_pattern, json_string, re.DOTALL):
-        key = match.group('key').strip('"')  # Strip quotes from key
+        key = match.group('key').strip('"')
         value = match.group('value').strip()
 
-        # If the value is another nested JSON (starts with '{' and ends with '}'), recursively parse it
         if value.startswith('{') and value.endswith('}'):
             extracted_values[key] = extract_values_from_json(value)
         else:
-            # Parse the value into the appropriate type (int, float, bool, etc.)
             extracted_values[key] = parse_value(value)
 
     if not extracted_values:
@@ -162,7 +154,6 @@ def load_json(file_name):
         return json.load(f)
 
 
-# it's dirty to type, so it's a good way to have fun
 def pack_user_ass_to_openai_messages(prompt: str, generated_content: str, using_amazon_bedrock: bool):
     if using_amazon_bedrock:
         return [
@@ -210,21 +201,15 @@ def list_of_list_to_csv(data: list[list]):
     )
 
 
-# -----------------------------------------------------------------------------------
-# Refer the utils functions of the official GraphRAG implementation:
-# https://github.com/microsoft/graphrag
 def clean_str(input: Any) -> str:
     """Clean an input string by removing HTML escapes, control characters, and other unwanted characters."""
-    # If we get non-string input, just give it back
     if not isinstance(input, str):
         return input
 
     result = html.unescape(input.strip())
-    # https://stackoverflow.com/questions/4324790/removing-control-characters-from-a-string-in-python
     return re.sub(r"[\x00-\x1f\x7f-\x9f]", "", result)
 
 
-# Utils types -----------------------------------------------------------------------
 @dataclass
 class EmbeddingFunc:
     embedding_dim: int
@@ -235,7 +220,6 @@ class EmbeddingFunc:
         return await self.func(*args, **kwargs)
 
 
-# Decorators ------------------------------------------------------------------------
 def limit_async_func_call(max_size: int, waitting_time: float = 0.0001):
     """Add restriction of maximum async calling times for a async func"""
 

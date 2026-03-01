@@ -8,7 +8,6 @@ from delete_utils import get_logger
 
 logger = get_logger()
 
-# ———————— 配置区 ————————
 DELETED_JSON     = "deleted_clusters_cache.json"
 REPORTS_JSON     = "cache/kv_store_community_reports.json"
 GRAPHML_IN       = "cache/graph_chunk_entity_relation.graphml"
@@ -18,10 +17,8 @@ NS = {
     'g': "http://graphml.graphdrawing.org/xmlns",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
 }
-# 注册 namespace，保证写出时不带 ns0 前缀
 ET.register_namespace('', NS['g'])
 ET.register_namespace('xsi', NS['xsi'])
-# ——————————————————————
 
 def load_deleted_level0(path):
     logger.info(f"[DEBUG] Loading deleted clusters from: {path}")
@@ -71,11 +68,9 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
     tree = ET.parse(graphml_in)
     root = tree.getroot()
 
-    # 复制 <key> 定义
     key_elems = [copy.deepcopy(e) for e in root.findall(f'{{{NS["g"]}}}key')]
     logger.info(f"[DEBUG] Found {len(key_elems)} <key> elements")
 
-    # 创建新的 root 和 graph
     new_root = ET.Element(root.tag, root.attrib)
     for k in key_elems:
         new_root.append(k)
@@ -83,7 +78,6 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
     orig_graph = root.find(f'{{{NS["g"]}}}graph')
     new_graph = ET.SubElement(new_root, orig_graph.tag, orig_graph.attrib)
 
-    # 添加节点：注意从 <graph> 元素中查找
     added_nodes = 0
     for node in orig_graph.findall(f'{{{NS["g"]}}}node'):
         nid = node.get('id')
@@ -95,7 +89,6 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
             logger.info(f"[TRACE] Skipped node: {repr(nid)}")
     logger.info(f"[DEBUG] Total nodes added: {added_nodes}")
 
-    # 添加边：同样从 <graph> 元素中查找
     added_edges = 0
     for edge in orig_graph.findall(f'{{{NS["g"]}}}edge'):
         src = edge.get('source')
@@ -111,20 +104,17 @@ def extract_subgraph(graphml_in, wanted_nodes, wanted_edges):
     return ET.ElementTree(new_root)
 
 def main():
-    # 1. 找到 level=0 的社区
     level0 = load_deleted_level0(DELETED_JSON)
     logger.info(f"[DEBUG] Level-0 clusters to process: {level0}")
     if not level0:
         logger.info("[ERROR] 未找到任何 level=0 的社区，退出。")
         return
 
-    # 2. 从报告中收集节点和边
     nodes, edges = load_reports_nodes_edges(REPORTS_JSON, level0)
     if not nodes and not edges:
         logger.info("[ERROR] 对应社区在报告中没有找到节点或边，退出。")
         return
 
-    # 3. 提取子图并写入新文件
     logger.info("[INFO] 开始提取子图...")
     subgraph_tree = extract_subgraph(GRAPHML_IN, nodes, edges)
     subgraph_tree.write(

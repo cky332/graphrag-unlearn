@@ -15,11 +15,9 @@ async def extract_entities(raw_node_id: str, graphml_path: str) -> list[str]:
     3. 在 GraphML 中校验 RAG 提取结果的存在性
     4. 合并两部分结果并去重，返回实体列表
     """
-    # 1. fuzz 匹配
     fuzz_matches = find_matching_nodes(graphml_path, raw_node_id)
     fuzz_entities = [node_id for node_id, _xml in fuzz_matches]
 
-    # 2. RAG + DeepSeek-v3
     if not os.environ.get("OPENAI_API_KEY"):
         raise RuntimeError("环境变量 OPENAI_API_KEY 未设置，请在 .env 文件或系统环境变量中配置后重试")
 
@@ -35,7 +33,6 @@ async def extract_entities(raw_node_id: str, graphml_path: str) -> list[str]:
         if hasattr(gr, "async_driver"):
             await gr.async_driver.close()
 
-    # 3. 在 GraphML 中校验 RAG 实体存在性
     graph = nx.read_graphml(graphml_path)
     def clean_node_id(raw: str) -> str:
         unesc = html.unescape(raw)
@@ -50,7 +47,6 @@ async def extract_entities(raw_node_id: str, graphml_path: str) -> list[str]:
 
     filtered_rag = [a for a in rag_entities if graph_has_node(a)]
 
-    # 4. 合并去重
     merged = []
     seen = set()
     for name in fuzz_entities + filtered_rag:
@@ -68,5 +64,4 @@ async def main():
     print(f"[合并结果] 共 {len(merged)} 个实体: {merged}")
 
 if __name__ == "__main__":
-    # 保持原来命令行可直接跑的功能
     asyncio.run(main())

@@ -12,7 +12,6 @@ from nano_graphrag.graphrag import GraphRAG
 from nano_graphrag._llm import deepseek_v3_complete
 from delete_utils import load_api_config
 
-# 从环境变量或 .env 文件加载 API 配置
 load_api_config()
 
 if sys.platform.startswith("win"):
@@ -30,7 +29,6 @@ async def rag_and_alias_extraction(raw_node_id: str, gr: GraphRAG) -> list[str]:
     resp_naive  = await gr.aquery(raw_node_id, param=QueryParam(mode="naive",  top_k=3))
     print(f"[NAIVE 查询结果]  {resp_naive}")
 
-    # 合并所有查询结果为一个纯文本字符串
     combined_text = ""
     for resp in (resp_local, resp_global, resp_naive):
         if isinstance(resp, str):
@@ -45,7 +43,6 @@ async def rag_and_alias_extraction(raw_node_id: str, gr: GraphRAG) -> list[str]:
             combined_text += str(resp) + " "
     combined_text = combined_text.strip()
 
-    # 用更严格的英文 Prompt 调用 deepseek-v3，只返回逗号分隔的实体名称列表
     prompt = (
         f"Text:\n{combined_text}\n\n"
         f'Task: Identify all unique proper names, aliases, or spelling variants that refer to "{raw_node_id}".\n'
@@ -58,7 +55,6 @@ async def rag_and_alias_extraction(raw_node_id: str, gr: GraphRAG) -> list[str]:
     )
     alias_resp = await deepseek_v3_complete(prompt)
 
-    # 拆分并清洗 alias 列表
     raw_aliases = []
     for line in alias_resp.replace("；", ";").replace("、", ",").splitlines():
         for part in line.split(","):
@@ -66,7 +62,6 @@ async def rag_and_alias_extraction(raw_node_id: str, gr: GraphRAG) -> list[str]:
             if a:
                 raw_aliases.append(a)
 
-    # 去重（忽略大小写）
     aliases = []
     seen = set()
     for a in raw_aliases:
@@ -93,25 +88,20 @@ def graph_has_node(graph: nx.Graph, alias: str) -> bool:
 async def main():
     raw_node_id = "Dumbledore"
 
-    # 完整的 GraphRAG 初始化，请根据你的环境调整参数
     gr = GraphRAG(
         working_dir="./cache",
         enable_local=True,
         enable_naive_rag=True,
-        # 若有 Azure/OpenAI 接入，可在此添加相关配置
     )
 
-    # 执行 RAG + 别名提取
     aliases = await rag_and_alias_extraction(raw_node_id, gr)
 
-    # 读取本地 GraphML
     graphml_path = os.path.join("cache", "graph_chunk_entity_relation.graphml")
     if not os.path.isfile(graphml_path):
         print(f"文件不存在: {graphml_path}")
         return
     graph = nx.read_graphml(graphml_path)
 
-    # 只保留那些确实在图里存在的别名
     valid_entities = [a for a in aliases if graph_has_node(graph, a)]
     print(f"在 GraphML 中存在的别名/实体: {valid_entities}")
 

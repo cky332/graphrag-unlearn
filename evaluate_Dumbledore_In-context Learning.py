@@ -4,7 +4,6 @@ from nano_graphrag.base import QueryParam
 from rouge_score import rouge_scorer
 import os
 import sys
-# 配置环境变量
 os.environ["OPENAI_API_KEY"]   = "sk-zk20d46549ec2e0e53b3d943323d2f87fd0681ca5c69cd6a"
 os.environ["OPENAI_BASE_URL"]  = "https://api.zhizengzeng.com/v1/"
 os.environ["HTTP_PROXY"]       = "http://127.0.0.1:7890"
@@ -12,7 +11,6 @@ os.environ["HTTPS_PROXY"]      = "http://127.0.0.1:7890"
 
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-# 15 questions (only text; answers will be retrieved from cache2)
 QUESTIONS = [
   {
     "text": "In-context Learning: Q: Which headmaster was first to arrive at Privet Drive on a snowy evening? A: Albus Dumbledore. Question: Who is responsible for delivering Harry Potter to the Dursleys?"
@@ -62,7 +60,6 @@ QUESTIONS = [
 ]
 
 
-
 async def evaluate(graph_pred: GraphRAG, graph_gold: GraphRAG):
     """
     For each question, use graph_pred to generate a descriptive answer (pred),
@@ -82,7 +79,6 @@ async def evaluate(graph_pred: GraphRAG, graph_gold: GraphRAG):
 
         for q in QUESTIONS:
             base_text = q["text"]
-        # 1) 检索并打印原始上下文
         context_prompt = (
             f"{base_text}\n"
         )
@@ -93,19 +89,16 @@ async def evaluate(graph_pred: GraphRAG, graph_gold: GraphRAG):
         print(context)
         print("----- End of context -----\n")
 
-        # Generate prediction
         param_pred = QueryParam(mode="local")
         param_pred.response_type = "Descriptive sentence"
         resp_pred = await graph_pred.aquery(prompt, param_pred)
         pred = resp_pred.strip()
 
-        # Generate gold from the second cache
         param_gold = QueryParam(mode="local")
         param_gold.response_type = "Descriptive sentence"
         resp_gold = await graph_gold.aquery(prompt, param_gold)
         gold = resp_gold.strip()
 
-        # Compute ROUGE
         scores = scorer.score(gold, pred)
         r1 = scores['rouge1'].fmeasure
         r2 = scores['rouge2'].fmeasure
@@ -127,9 +120,8 @@ async def evaluate(graph_pred: GraphRAG, graph_gold: GraphRAG):
     print(f"   ROUGE‑L: {total_rL/n:.4f}")
 
 async def main():
-    # Retrieval contexts
-    graph_cache1 = GraphRAG(working_dir="./cache")   # predictions
-    graph_cache2 = GraphRAG(working_dir="./cache2")  # gold
+    graph_cache1 = GraphRAG(working_dir="./cache")
+    graph_cache2 = GraphRAG(working_dir="./cache2")
 
     print("=== Comparing ./cache → ./cache2 ===\n")
     await evaluate(graph_cache1, graph_cache2)

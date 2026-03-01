@@ -5,7 +5,6 @@ import sys
 import xml.etree.ElementTree as ET
 from delete_utils import clean_node_id, anonymize_text, get_logger
 
-# File paths for hop lists and GraphML
 ONE_HOP_FILE = 'one_hop_nodes.txt'
 TWO_HOP_FILE = 'two_hop_nodes.txt'
 THREE_HOP_FILE = 'three_hop_nodes.txt'
@@ -27,11 +26,8 @@ async def anonymize_all_chunks(
     3. Load kv_store JSON (ignoring encoding errors) and anonymize each chunk's content.
     4. Overwrite kv_store and return mapping of original vs anonymized texts.
     """
-    # 1. Build entity set
     entity_set = set()
-    # Add main entity with quotes
     entity_set.add(f'"{entity}"')
-    # Read hop lists (they already contain quoted names)
     for fname in (ONE_HOP_FILE, TWO_HOP_FILE, THREE_HOP_FILE):
         if os.path.exists(fname):
             with open(fname, 'r', encoding='utf-8', errors='ignore') as f:
@@ -40,7 +36,6 @@ async def anonymize_all_chunks(
                     if line:
                         entity_set.add(line)
 
-    # 2. Parse GraphML to collect chunk IDs
     ns = {'g': 'http://graphml.graphdrawing.org/xmlns'}
     tree = ET.parse(GRAPHML_FILE)
     root = tree.getroot()
@@ -53,10 +48,8 @@ async def anonymize_all_chunks(
                 parts = data_elem.text.split('<SEP>')
                 chunk_ids.update(parts)
 
-    # 3. Load and anonymize KV store
     if not os.path.isfile(kv_store_path):
         raise FileNotFoundError(f"KV store not found: {kv_store_path}")
-    # Read JSON with ignore errors
     with open(kv_store_path, 'r', encoding='utf-8', errors='ignore') as f:
         try:
             kv_store = json.load(f)
@@ -68,7 +61,6 @@ async def anonymize_all_chunks(
         entry = kv_store.get(cid)
         if entry is None:
             continue
-        # Handle string entries or dict entries with 'content'
         if isinstance(entry, str):
             original = entry
             anonymized = anonymize_text(original, raw_node_id_default)
@@ -82,7 +74,6 @@ async def anonymize_all_chunks(
             continue
         results[cid] = {'original': original, 'anonymized': anonymized}
 
-    # 4. Save updated KV store
     with open(kv_store_path, 'w', encoding='utf-8') as f:
         json.dump(kv_store, f, ensure_ascii=False, indent=2)
 
