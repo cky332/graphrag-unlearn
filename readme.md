@@ -46,7 +46,3 @@ python "delete all.py" <实体名>
 ├── nano_graphrag/                # GraphRAG 核心（基于 nano-graphrag）
 └── cache/                        # 数据缓存目录
 ```
-
-## 致谢
-
-基于 [nano-graphrag](https://github.com/gusye1234/nano-graphrag) 开发。
