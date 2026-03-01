@@ -1,4 +1,4 @@
-# GraphRAG Entity Deletion
+# GraphRAG Unlearn
 
 基于 [nano-graphrag](https://github.com/gusye1234/nano-graphrag) 的知识图谱实体删除工具。从 GraphRAG 的知识图谱中删除指定实体及其关联信息，并通过多种攻击策略评估删除效果。
 
