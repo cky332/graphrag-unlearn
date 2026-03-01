@@ -41,17 +41,21 @@ async def _execute_deletion(
     task_id: str, entity_name: str, cache_dir: str, no_backup: bool
 ):
     """后台协程：获取删除锁后执行删除流程。"""
-    async with task_store.deletion_lock:
-        task_store.mark_running(task_id)
-        try:
-            report = await run_deletion(
-                entity_name=entity_name,
-                cache_dir=cache_dir,
-                no_backup=no_backup,
-            )
-            task_store.mark_completed(task_id, report.to_json())
-        except Exception as e:
-            task_store.mark_failed(task_id, str(e))
+    try:
+        async with task_store.deletion_lock:
+            task_store.mark_running(task_id)
+            try:
+                report = await run_deletion(
+                    entity_name=entity_name,
+                    cache_dir=cache_dir,
+                    no_backup=no_backup,
+                )
+                task_store.mark_completed(task_id, report.to_json())
+            except Exception as e:
+                task_store.mark_failed(task_id, str(e))
+    except Exception as e:
+        # 获取锁之前或 mark_running 就失败的情况
+        task_store.mark_failed(task_id, str(e))
 
 
 @app.post("/api/v1/entities/delete", response_model=TaskResponse, status_code=202)
@@ -60,6 +64,20 @@ async def delete_entity(request: DeleteRequest):
 
     返回 202 Accepted 和 task_id，通过 GET /api/v1/tasks/{task_id} 查询进度。
     """
+    # 先校验实体是否存在于图中
+    graphml_path = os.path.join(
+        request.cache_dir, "graph_chunk_entity_relation.graphml"
+    )
+    try:
+        validate_entity_exists(graphml_path, request.entity_name)
+    except EntityNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"实体 '{request.entity_name}' 在知识图谱中不存在，无法删除。",
+        )
+    except DataFileError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
     if task_store.is_entity_active(request.entity_name):
         raise HTTPException(
             status_code=409,
@@ -92,9 +110,12 @@ async def list_tasks():
     return task_store.list_tasks()
 
 
-@app.get("/api/v1/entities/{entity_name}", response_model=EntityExistsResponse)
+@app.get("/api/v1/entities/{entity_name:path}", response_model=EntityExistsResponse)
 async def check_entity(entity_name: str, cache_dir: str = "cache"):
-    """检查实体是否存在于知识图谱中。"""
+    """检查实体是否存在于知识图谱中。
+
+    实体名含空格时需 URL 编码，例如: /api/v1/entities/MR.%20DURSLEY
+    """
     graphml_path = os.path.join(cache_dir, "graph_chunk_entity_relation.graphml")
     try:
         info = validate_entity_exists(graphml_path, entity_name)

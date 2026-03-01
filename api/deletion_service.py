@@ -30,7 +30,10 @@ def _ensure_initialized():
     if _initialized:
         return
 
-    load_api_config()
+    # .env 文件相对于项目根目录查找，而不是 CWD
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_file = os.path.join(project_root, ".env")
+    load_api_config(env_file)
 
     global delete_vdb_entities, extract_entities, update_graphml_descriptions
     global remove_node_and_edges, delete_community_pipeline
