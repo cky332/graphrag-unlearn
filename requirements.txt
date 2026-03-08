@@ -28,3 +28,9 @@ pydantic>=2.0.0
 # Web 框架
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
+
+# API 安全与中间件
+slowapi>=0.1.9
+
+# 异步 SQLite（任务持久化）
+aiosqlite>=0.19.0

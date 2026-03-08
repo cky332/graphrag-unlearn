@@ -3,6 +3,7 @@
 import os
 import xml.etree.ElementTree as ET
 
+from api.config import ServerConfig
 from delete_utils import (
     get_logger,
     load_api_config,
@@ -63,15 +64,15 @@ def _ensure_initialized():
 
 async def run_deletion(
     entity_name: str,
-    cache_dir: str = "cache",
     no_backup: bool = False,
 ) -> DeletionReport:
     """执行完整的实体删除流程。
 
-    从 delete all.py main() 提取的核心逻辑，去除 argparse 和交互确认。
+    cache_dir 从 ServerConfig 读取，不再由调用方传入。
     成功时返回 DeletionReport，失败时自动从备份恢复并抛出异常。
     """
     _ensure_initialized()
+    cache_dir = ServerConfig.get_cache_dir()
     vdb_path = os.path.join(cache_dir, "vdb_entities.json")
     graphml_path = os.path.join(cache_dir, "graph_chunk_entity_relation.graphml")
     kv_store_path = os.path.join(cache_dir, "kv_store_text_chunks.json")

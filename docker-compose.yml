@@ -7,6 +7,10 @@ services:
     volumes:
       # 挂载缓存目录，持久化图数据
       - ./cache:/app/cache
+      # 挂载数据目录，持久化任务数据库
+      - ./data:/app/data
+    environment:
+      - GRAPHRAG_TASK_DB=/app/data/tasks.db
     ports:
       - "8000:8000"
     healthcheck:
