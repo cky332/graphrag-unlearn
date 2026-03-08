@@ -28,8 +28,9 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
                     if val:
                         entities.add(val)
 
+    logger.info(f"[社区报告匿名化] 从 hop 文件加载了 {len(entities)} 个实体")
     if not entities:
-        logger.info("No hop nodes found.")
+        logger.info("[社区报告匿名化] No hop nodes found.")
         return
 
     ns = {'g': 'http://graphml.graphdrawing.org/xmlns'}
@@ -48,8 +49,9 @@ def update_reports_for_entity(raw_node_id_default: str) -> None:
                 except json.JSONDecodeError:
                     continue
 
+    logger.info(f"[社区报告匿名化] 找到 {len(cluster_ids)} 个 cluster ID: {cluster_ids}")
     if not cluster_ids:
-        logger.info("No cluster IDs found for given entities.")
+        logger.info("[社区报告匿名化] No cluster IDs found for given entities.")
         return
 
     if not os.path.isfile(COMMUNITY_REPORTS_FILE):

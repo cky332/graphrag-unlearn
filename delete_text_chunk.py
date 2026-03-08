@@ -26,6 +26,7 @@ async def anonymize_all_chunks(
     3. Load kv_store JSON (ignoring encoding errors) and anonymize each chunk's content.
     4. Overwrite kv_store and return mapping of original vs anonymized texts.
     """
+    logger.info(f"[文本块匿名化] 开始处理 entity='{entity}', target='{raw_node_id_default}'")
     entity_set = set()
     entity_set.add(f'"{entity}"')
     for fname in (ONE_HOP_FILE, TWO_HOP_FILE, THREE_HOP_FILE):
@@ -35,18 +36,23 @@ async def anonymize_all_chunks(
                     line = line.strip()
                     if line:
                         entity_set.add(line)
+    logger.info(f"[文本块匿名化] 从 hop 文件加载了 {len(entity_set)} 个实体")
 
     ns = {'g': 'http://graphml.graphdrawing.org/xmlns'}
     tree = ET.parse(GRAPHML_FILE)
     root = tree.getroot()
     chunk_ids: set[str] = set()
+    matched_nodes = 0
     for node in root.findall('.//g:node', ns):
         node_id = node.get('id')
         if node_id in entity_set:
+            matched_nodes += 1
             data_elem = node.find('g:data[@key="d2"]', ns)
             if data_elem is not None and data_elem.text:
                 parts = data_elem.text.split('<SEP>')
                 chunk_ids.update(parts)
+    logger.info(f"[文本块匿名化] 在 GraphML 中匹配到 {matched_nodes} 个节点，"
+                 f"提取到 {len(chunk_ids)} 个 chunk ID")
 
     if not os.path.isfile(kv_store_path):
         raise FileNotFoundError(f"KV store not found: {kv_store_path}")
@@ -55,6 +61,7 @@ async def anonymize_all_chunks(
             kv_store = json.load(f)
         except json.JSONDecodeError:
             raise ValueError(f"Invalid JSON in KV store: {kv_store_path}")
+    logger.info(f"[文本块匿名化] KV store 加载完成，共 {len(kv_store)} 条记录")
 
     results: dict[str, dict[str, str]] = {}
     for cid in chunk_ids:
@@ -77,6 +84,7 @@ async def anonymize_all_chunks(
     with open(kv_store_path, 'w', encoding='utf-8') as f:
         json.dump(kv_store, f, ensure_ascii=False, indent=2)
 
+    logger.info(f"[文本块匿名化] 完成，共匿名化 {len(results)} 个 chunk，已写回 {kv_store_path}")
     return results
 
 

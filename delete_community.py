@@ -34,47 +34,70 @@ async def delete_community_pipeline(raw_node_id: str):
       9) 合并更新后的社区报告
      10) 更新 GraphML 节点-社区映射
     """
+    import time
+    pipeline_start = time.time()
+
+    t0 = time.time()
     logger.info(f"[DC] 1) 删除节点/边: {raw_node_id}")
     direct_main(raw_node_id)
+    logger.info(f"[DC] 1) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info(f"[DC] 2) 异步更新报告 (禁止实体: {raw_node_id})")
     await update_main(raw_node_id)
+    logger.info(f"[DC] 2) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info(f"[DC] 3) 异步剪枝间接边: {raw_node_id}")
     await prune_edges_for_node(raw_node_id)
+    logger.info(f"[DC] 3) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info(f"[DC] 4) 同步评估社区结构变化")
     changed = evaluate_main()
+    logger.info(f"[DC] 4) 完成，耗时 {time.time() - t0:.1f}s，changed={changed}")
 
     if not changed:
-        logger.info("[DC] 未检测到变化，跳过后续步骤")
+        logger.info(f"[DC] 未检测到变化，跳过后续步骤（社区流水线耗时 {time.time() - pipeline_start:.1f}s）")
         return
 
+    t0 = time.time()
     logger.info("[DC] 6) 生成子图")
     generate_graphml_main()
+    logger.info(f"[DC] 6) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info("[DC] 7) Leiden 聚类与报告")
     try:
         await leiden_main()
+        logger.info(f"[DC] 7) 完成，耗时 {time.time() - t0:.1f}s")
     except Exception as e:
-        logger.warning(f"[DC] Leiden 失败，跳过后续: {e}")
+        logger.warning(f"[DC] Leiden 失败（耗时 {time.time() - t0:.1f}s），跳过后续: {e}")
         traceback.print_exc()
         return
 
+    t0 = time.time()
     logger.info("[DC] 8) 确保社区 ID 唯一")
     ensure_unique_ids(
         base_file=BASE_REPORTS_FILE,
         new_file=NEW_REPORTS_FILE,
     )
+    logger.info(f"[DC] 8) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info("[DC] 9) 合并更新后的社区报告")
     merge_main()
+    logger.info(f"[DC] 9) 完成，耗时 {time.time() - t0:.1f}s")
 
+    t0 = time.time()
     logger.info("[DC] 10) 更新 GraphML 节点-社区映射")
     try:
         update_node_cluster_main()
+        logger.info(f"[DC] 10) 完成，耗时 {time.time() - t0:.1f}s")
     except Exception as e:
         logger.warning(f"[DC] 更新映射失败: {e}")
+
+    logger.info(f"[DC] 社区删除流水线完成，总耗时 {time.time() - pipeline_start:.1f}s")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

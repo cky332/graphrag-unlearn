@@ -20,10 +20,12 @@ async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_n
     4. 对 hop=1、hop=2、hop=3 边（分别是 raw<->1hop、1hop<->2hop、2hop<->3hop）的 key="d5" 描述，使用 raw_node_id 进行匿名化
     5. 写回文件
     """
+    logger.info(f"[描述匿名化] 开始处理 entity='{raw_node_id}', target='{raw_node_id2}'")
     ET.register_namespace("", "http://graphml.graphdrawing.org/xmlns")
     ns = {"g": "http://graphml.graphdrawing.org/xmlns"}
     tree = ET.parse(graphml_path)
     root = tree.getroot()
+    logger.info(f"[描述匿名化] GraphML 加载完成: {graphml_path}")
 
     target_norm = raw_node_id.strip().lower()
     raw_quoted = f'"{raw_node_id}"'
@@ -65,20 +67,29 @@ async def update_graphml_descriptions(graphml_path: str, raw_node_id: str, raw_n
             edges_3hop.append(edge)
 
     nodes_to_anonymize = {raw_quoted} | one_hop | two_hop | three_hop
+    logger.info(f"[描述匿名化] 邻居统计: 1-hop={len(one_hop)}, 2-hop={len(two_hop)}, "
+                 f"3-hop={len(three_hop)}, 待匿名化节点总数={len(nodes_to_anonymize)}")
+    logger.info(f"[描述匿名化] 边统计: 1-hop边={len(edges_1hop)}, 2-hop边={len(edges_2hop)}, "
+                 f"3-hop边={len(edges_3hop)}")
 
+    anonymized_nodes = 0
     for node in root.findall(".//g:node", ns):
         if node.get("id") in nodes_to_anonymize:
             data = node.find('g:data[@key="d1"]', ns)
             if data is not None and data.text:
                 data.text = anonymize_text(data.text, raw_node_id2)
+                anonymized_nodes += 1
 
+    anonymized_edges = 0
     for edge in edges_1hop + edges_2hop + edges_3hop:
         data = edge.find('g:data[@key="d5"]', ns)
         if data is not None and data.text:
             data.text = anonymize_text(data.text, raw_node_id2)
+            anonymized_edges += 1
 
     tree.write(graphml_path, encoding="utf-8", xml_declaration=True)
-    logger.info(f"Anonymized '{raw_node_id2}', its 1/2/3-hop neighbors and related edges in {graphml_path}")
+    logger.info(f"[描述匿名化] 完成: 匿名化 {anonymized_nodes} 个节点描述, "
+                 f"{anonymized_edges} 条边描述, 已写回 {graphml_path}")
 
     with open('one_hop_nodes.txt', 'w', encoding='utf-8') as f:
         for node in one_hop:
