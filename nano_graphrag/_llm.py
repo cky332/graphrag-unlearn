@@ -3,7 +3,7 @@ import numpy as np
 from typing import Optional, List, Any, Callable
 
 import aioboto3
-from openai import AsyncOpenAI, AsyncAzureOpenAI, APIConnectionError, RateLimitError
+from openai import AsyncOpenAI, AsyncAzureOpenAI, APIConnectionError, RateLimitError, APITimeoutError
 
 from tenacity import (
     retry,
@@ -24,7 +24,7 @@ global_amazon_bedrock_async_client = None
 def get_openai_async_client_instance():
     global global_openai_async_client
     if global_openai_async_client is None:
-        global_openai_async_client = AsyncOpenAI()
+        global_openai_async_client = AsyncOpenAI(timeout=300.0)
     return global_openai_async_client
 
 async def deepseek_v3_complete(
@@ -55,7 +55,7 @@ def get_amazon_bedrock_async_client_instance():
 @retry(
     stop=stop_after_attempt(5),
     wait=wait_exponential(multiplier=1, min=4, max=10),
-    retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
+    retry=retry_if_exception_type((RateLimitError, APIConnectionError, APITimeoutError)),
 )
 async def openai_complete_if_cache(
     model, prompt, system_prompt=None, history_messages=[], **kwargs
