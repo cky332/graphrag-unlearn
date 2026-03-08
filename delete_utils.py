@@ -170,7 +170,7 @@ def validate_entity_exists(graphml_path: str, entity_name: str) -> dict:
 
     if entity_info is None:
         raise EntityNotFoundError(
-            f"实体 '{entity_name}' 在图中不存在: {graphml_path}"
+            f"实体 '{entity_name}' 在图中不存在"
         )
 
     edge_count = 0
@@ -285,7 +285,7 @@ class DeletionReport:
         return "\n".join(lines)
 
     def to_json(self) -> dict:
-        """导出为 JSON 格式。"""
+        """导出为 JSON 格式（内部使用，包含完整信息）。"""
         return {
             "entity": self.entity,
             "related_entities": self.related_entities,
@@ -296,6 +296,21 @@ class DeletionReport:
             "vdb_entries_removed": self.vdb_entries_removed,
             "backup_dir": self.backup_dir,
             "errors": self.errors,
+            "start_time": self.start_time.isoformat() if self.start_time else None,
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+        }
+
+    def to_api_json(self) -> dict:
+        """导出为 API 安全的 JSON 格式（排除内部路径和错误详情）。"""
+        return {
+            "entity": self.entity,
+            "related_entities": self.related_entities,
+            "nodes_removed": self.nodes_removed,
+            "edges_removed": self.edges_removed,
+            "chunks_anonymized": self.chunks_anonymized,
+            "communities_updated": self.communities_updated,
+            "vdb_entries_removed": self.vdb_entries_removed,
+            "error_count": len(self.errors),
             "start_time": self.start_time.isoformat() if self.start_time else None,
             "end_time": self.end_time.isoformat() if self.end_time else None,
         }

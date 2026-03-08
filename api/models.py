@@ -1,10 +1,11 @@
 """Pydantic 请求/响应模型。"""
 
+import re
 from enum import Enum
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class TaskStatus(str, Enum):
@@ -15,9 +16,20 @@ class TaskStatus(str, Enum):
 
 
 class DeleteRequest(BaseModel):
-    entity_name: str = Field(..., min_length=1, description="要删除的实体名称")
-    cache_dir: str = Field(default="cache", description="缓存目录路径")
+    entity_name: str = Field(
+        ..., min_length=1, max_length=200, description="要删除的实体名称"
+    )
     no_backup: bool = Field(default=False, description="跳过删除前备份")
+
+    @field_validator("entity_name")
+    @classmethod
+    def validate_entity_name(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("实体名称不能为空")
+        if not re.match(r"^[\w\s.\-'\"()\u4e00-\u9fff\u3000-\u303f]+$", v, re.UNICODE):
+            raise ValueError("实体名称包含无效字符")
+        return v
 
 
 class TaskResponse(BaseModel):
@@ -39,5 +51,4 @@ class EntityExistsResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str = "ok"
-    cache_dir_exists: bool
-    graphml_exists: bool
+    service_ready: bool = Field(description="数据文件是否就绪")
