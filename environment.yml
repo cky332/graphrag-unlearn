@@ -1,0 +1,28 @@
+# Anaconda 环境配置
+# 用法: conda env create -f environment.yml
+#       conda activate graphrag-delete
+name: graphrag-delete
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+
+  # 数值计算
+  - numpy>=1.24.0
+  - networkx>=3.0
+
+  # 向量检索
+  - hnswlib>=0.7.0
+
+  # pip 安装的包（conda 没有的或 pip 版本更合适的）
+  - pip
+  - pip:
+    - openai>=1.0.0
+    - tiktoken>=0.5.0
+    - aioboto3>=12.0.0
+    - graspologic>=3.3.0
+    - nano-vectordb>=0.0.4
+    - xxhash>=3.0.0
+    - tenacity>=8.2.0
+    - pydantic>=2.0.0

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml_extract>
+  <node id=""DUMBLEDORE"">
+    <data key="d0">"PERSON"</data>
+    <data key="d1">**Albus Dumbledore** is the revered and powerful headmaster of Hogwarts School of Witchcraft and Wizardry, widely regarded as the greatest wizard of modern times. Known for his wisdom, leadership, and eccentric behavior, he is a key figure in the wizarding world and the only wizard feared by Lord Voldemort. Dumbledore was sorted into Gryffindor during his own time at Hogwarts and has since become a mentor to Harry Potter, who deeply admires and trusts him, as seen when Harry envisions him in the Mirror of Erised.  
+
+Dumbledore is instrumental in shaping Harry’s life, having made the crucial decision to place him with the Dursleys for his safety following the deaths of James and Lily Potter. He remains a guiding force for Harry, offering advice on matters involving Voldemort, the Philosopher’s Stone, and his parents’ legacy, though Harry occasionally questions his honesty. As headmaster, Dumbledore is actively involved in protecting the Philosopher’s Stone, working alongside Hagrid to safeguard it, and is sought after by students like Hermione for help in emergencies.  
+
+Despite his immense influence, Dumbledore is known for his calm and approachable demeanor, unafraid to speak Voldemort’s name and often engaging in school traditions like the Christmas feast and the Hogwarts school song. He is also a decisive leader, awarding Gryffindor critical points that secure their victory in the house cup and overseeing Quidditch matches, where he congratulates Harry on his successes.  
+
+Though offered the position of Minister of Magic, Dumbledore chose to remain at Hogwarts, dedicating himself to education and the protection of the wizarding world. His absence at times—such as when he is in London—can create vulnerabilities, as seen when Quirrell exploits it. Nevertheless, his presence looms large, and his reputation as a wise, authoritative, and protective figure remains unchallenged.</data>
+    <data key="d2">chunk-9f08343d4ce0077f159bdca2104fd9e6<SEP>chunk-9af8b4eef4a5930ccf2d732ecc0c8ed5<SEP>chunk-48c8774dc2b4920db3f0743c06de0f87<SEP>chunk-3230098c868daeaf5832d473dc638e24<SEP>chunk-3b06affd4457f7093c635f57d838af70<SEP>chunk-70d9dbf23bfc9c3473552084c55d3e9b<SEP>chunk-7a990bf9b4fe3371f867beac09d47591<SEP>chunk-dcf357ba6886dac19a1281224e4aa24f<SEP>chunk-e976947b68242b45dda38dfc476bbb1d<SEP>chunk-49cbcfff0c964735f173b8d56b6dbf8b<SEP>chunk-5a632542e5ba72b2f5b6e2f6c316c9cd<SEP>chunk-743eba5e33b3d9c7286c1be9bb5c4df8<SEP>chunk-14997594e026a24d0bc5279b5a1274d2<SEP>chunk-7294336b1b26ee03f70a09a2449d8525<SEP>chunk-28deebfd77bb67f0280ef9e7b84489af<SEP>chunk-26f37ad8011292d17d9554a31908455c<SEP>chunk-d8749da8c935f392aa1f706cd46db78a<SEP>chunk-a576e748bf4e7c04ebb888446e2c9b88<SEP>chunk-84ec34fa6274fd60c31e2dc386a37ff2<SEP>chunk-4f71dec2666d57aa25ee44feac190df3<SEP>chunk-7ca033116898f2ab6ab1ad55dff849d7<SEP>chunk-1ffbbc42ec9a7793d3cc45b3f8f18f84<SEP>chunk-00e69a515b0165e2668c9f6596183242<SEP>chunk-2d878134ff402f7d91a6b91f74933289<SEP>chunk-920ae38b81cc5cdfba021049b87e227b<SEP>chunk-c98d87ff9192d5e9f811c3e40054b50d<SEP>chunk-94d6c180186096743c7ac74dd4a9f9e9<SEP>chunk-4bab9cf02a37c76292d20d598408db9d<SEP>chunk-eaf96a9c374ae52f329b56d8e356d06e</data>
+    <data key="d3">[{"level": 0, "cluster": 3}, {"level": 1, "cluster": 29}, {"level": 2, "cluster": 107}]</data>
+  </node>
+  <edge source=""THE PUT-OUTER"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Dumbledore uses the Put-Outer to manipulate the street lamps, demonstrating his mastery of magical devices."</data>
+    <data key="d6">chunk-3b06affd4457f7093c635f57d838af70</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""VOLDEMORT"" target=""DUMBLEDORE"">
+    <data key="d4">26.0</data>
+    <data key="d5">"Dumbledore is the only one Voldemort is afraid of, indicating a powerful adversarial relationship."<SEP>"Dumbledore is unafraid of Voldemort and acknowledges his powers, while also being the only one Voldemort feared."<SEP>"Dumbledore provides insight into Voldemort's nature and his inability to understand love."</data>
+    <data key="d6">chunk-e976947b68242b45dda38dfc476bbb1d<SEP>chunk-4f71dec2666d57aa25ee44feac190df3<SEP>chunk-a576e748bf4e7c04ebb888446e2c9b88</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MADAM POMFREY"" target=""DUMBLEDORE"">
+    <data key="d4">5.0</data>
+    <data key="d5">"Dumbledore mentions Madam Pomfrey in a lighthearted context about his earmuffs, indicating a friendly acquaintance."</data>
+    <data key="d6">chunk-4f71dec2666d57aa25ee44feac190df3</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""THE WIZARDING WORLD"" target=""DUMBLEDORE"">
+    <data key="d4">9.0</data>
+    <data key="d5">"Dumbledore is a key figure in the Wizarding World, making decisions that affect its future."</data>
+    <data key="d6">chunk-7a990bf9b4fe3371f867beac09d47591</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""THE LETTER"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore writes a letter to the Dursleys explaining Harry's situation and places it with Harry on the doorstep."</data>
+    <data key="d6">chunk-7a990bf9b4fe3371f867beac09d47591</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""ORDER OF MERLIN, FIRST CLASS"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Dumbledore holds this prestigious title, indicating his high status in the wizarding world."</data>
+    <data key="d6">chunk-ea8206b9f511581261360a695f1344e5</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""SUPREME MUGWUMP"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore's role in the International Confederation of Wizards highlights his influence."</data>
+    <data key="d6">chunk-ea8206b9f511581261360a695f1344e5</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MINISTRY OF MAGIC"" target=""DUMBLEDORE"">
+    <data key="d4">16.0</data>
+    <data key="d5">"Dumbledore leaves for London after receiving an urgent owl from the Ministry of Magic."<SEP>"The Ministry of Magic wanted Dumbledore to be Minister, indicating his importance in the magical world."</data>
+    <data key="d6">chunk-00e69a515b0165e2668c9f6596183242<SEP>chunk-2d878134ff402f7d91a6b91f74933289</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""CORNELIUS FUDGE"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Cornelius Fudge often seeks advice from Dumbledore, showing his reliance on Dumbledore's wisdom."</data>
+    <data key="d6">chunk-00e69a515b0165e2668c9f6596183242</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""NICOLAS FLAMEL"" target=""DUMBLEDORE"">
+    <data key="d4">9.0</data>
+    <data key="d5">"Dumbledore and Nicolas Flamel are friends and collaborators in alchemy, with Dumbledore safeguarding the Sorcerer's Stone."</data>
+    <data key="d6">chunk-70d9dbf23bfc9c3473552084c55d3e9b</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HERMIONE GRANGER"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Hermione admires Dumbledore, referencing his association with Gryffindor."</data>
+    <data key="d6">chunk-5a632542e5ba72b2f5b6e2f6c316c9cd</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HIGH TABLE"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore sits at the High Table during Christmas dinner."</data>
+    <data key="d6">chunk-1ffbbc42ec9a7793d3cc45b3f8f18f84</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MALFOY"" target=""DUMBLEDORE"">
+    <data key="d4">5.0</data>
+    <data key="d5">"Malfoy considers reporting Norbert to Dumbledore, which would cause trouble for Hagrid and the group."</data>
+    <data key="d6">chunk-94d6c180186096743c7ac74dd4a9f9e9</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MADAM HOOCH"" target=""DUMBLEDORE"">
+    <data key="d4">5.0</data>
+    <data key="d5">"Dumbledore mentions Madam Hooch as the contact for Quidditch trials, linking them administratively."</data>
+    <data key="d6">chunk-4ee063ab8af79a0ec537f9b6f68e655e</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MR. FILCH"" target=""DUMBLEDORE"">
+    <data key="d4">5.0</data>
+    <data key="d5">"Dumbledore relays Mr. Filch's reminder about no magic in corridors, showing their roles in enforcing rules."</data>
+    <data key="d6">chunk-4ee063ab8af79a0ec537f9b6f68e655e</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""WEASLEY TWINS"" target=""DUMBLEDORE"">
+    <data key="d4">6.0</data>
+    <data key="d5">"Dumbledore indirectly addresses the Weasley twins about the forbidden forest, hinting at their mischief."</data>
+    <data key="d6">chunk-4ee063ab8af79a0ec537f9b6f68e655e</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""PROFESSOR FLITWICK"" target=""DUMBLEDORE"">
+    <data key="d4">6.0</data>
+    <data key="d5">"Professor Flitwick shares a joke with Dumbledore during Christmas dinner."</data>
+    <data key="d6">chunk-1ffbbc42ec9a7793d3cc45b3f8f18f84</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""INVISIBILITY CLOAK"" target=""DUMBLEDORE"">
+    <data key="d4">6.0</data>
+    <data key="d5">"Dumbledore held onto the invisibility cloak and later gave it to Harry."</data>
+    <data key="d6">chunk-e976947b68242b45dda38dfc476bbb1d</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""CHRISTMAS DINNER"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Dumbledore participates in the Christmas Dinner at Hogwarts, enjoying the festivities."</data>
+    <data key="d6">chunk-1ffbbc42ec9a7793d3cc45b3f8f18f84</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""MIRROR OF ERISED"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore designed the enchantment on the Mirror of Erised to protect the Philosopher's Stone."</data>
+    <data key="d6">chunk-e976947b68242b45dda38dfc476bbb1d</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""THE FAMOUS WIZARD CARD"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"The card features Dumbledore and provides key information about Nicolas Flamel."</data>
+    <data key="d6">chunk-70d9dbf23bfc9c3473552084c55d3e9b</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""THE TWELVE USES OF DRAGON'S BLOOD"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore discovered the twelve uses of dragon's blood, adding to his fame."</data>
+    <data key="d6">chunk-70d9dbf23bfc9c3473552084c55d3e9b</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""THE PHILOSOPHER'S STONE"" target=""DUMBLEDORE"">
+    <data key="d4">8.0</data>
+    <data key="d5">"Dumbledore is involved in protecting the Philosopher's Stone."</data>
+    <data key="d6">chunk-9f08343d4ce0077f159bdca2104fd9e6</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""ENTRANCE HALL"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Dumbledore meets Hermione and Ron in the Entrance Hall, showing his awareness of events."</data>
+    <data key="d6">chunk-57cfda80d965f0ca64c717f98bc1f05a</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""PHILOSOPHER'S STONE"" target=""DUMBLEDORE"">
+    <data key="d4">9.0</data>
+    <data key="d5">"Dumbledore was instrumental in protecting the Philosopher's Stone and ensuring it could not be misused."</data>
+    <data key="d6">chunk-e976947b68242b45dda38dfc476bbb1d</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""GRYFFINDOR"" target=""DUMBLEDORE"">
+    <data key="d4">9.0</data>
+    <data key="d5">"Dumbledore awards points to Gryffindor, leading to their victory in the house cup."</data>
+    <data key="d6">chunk-3230098c868daeaf5832d473dc638e24</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""SLYTHERIN"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Dumbledore's decision to award points to Gryffindor results in Slytherin losing the house cup."</data>
+    <data key="d6">chunk-3230098c868daeaf5832d473dc638e24</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""SNAPE"" target=""DUMBLEDORE"">
+    <data key="d4">7.0</data>
+    <data key="d5">"Snape is a professor at Hogwarts under Dumbledore's leadership, and both are working to protect Harry and the Philosopher's Stone."</data>
+    <data key="d6">chunk-eaf96a9c374ae52f329b56d8e356d06e</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HOGWARTS"" target=""DUMBLEDORE"">
+    <data key="d4">35.0</data>
+    <data key="d5">"Dumbledore is the headmaster of Hogwarts and its primary protector against threats like Voldemort."<SEP>"Dumbledore is the headmaster of Hogwarts, leading the school and its traditions."<SEP>"Dumbledore is the headmaster of Hogwarts, making it a safe place during dark times."<SEP>"Dumbledore serves at Hogwarts, showing his commitment to the school."</data>
+    <data key="d6">chunk-00e69a515b0165e2668c9f6596183242<SEP>chunk-84ec34fa6274fd60c31e2dc386a37ff2<SEP>chunk-26f37ad8011292d17d9554a31908455c<SEP>chunk-a576e748bf4e7c04ebb888446e2c9b88</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HERMIONE"" target=""DUMBLEDORE"">
+    <data key="d4">6.0</data>
+    <data key="d5">"Hermione suggests going to Dumbledore for help regarding their suspicions about Snape."</data>
+    <data key="d6">chunk-d8749da8c935f392aa1f706cd46db78a</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HARRY POTTER"" target=""DUMBLEDORE"">
+    <data key="d4">26.0</data>
+    <data key="d5">"Dumbledore ensures Harry's safety by placing him with the Dursleys, showing a protective and strategic relationship."<SEP>"Dumbledore is involved in bringing Harry to safety after his parents' death, indicating a protective relationship."<SEP>"Dumbledore makes the decision to place Harry with the Dursleys for his safety and future well-being."</data>
+    <data key="d6">chunk-3b06affd4457f7093c635f57d838af70<SEP>chunk-4f71dec2666d57aa25ee44feac190df3<SEP>chunk-7a990bf9b4fe3371f867beac09d47591</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""HARRY"" target=""DUMBLEDORE"">
+    <data key="d4">101.0</data>
+    <data key="d5">"Dumbledore awards Harry points for his courage, leading to Gryffindor's victory."<SEP>"Dumbledore congratulates Harry after his victory, showing his support."<SEP>"Dumbledore is mentioned in the letter left for Harry, indicating his importance in Harry's life and the wizarding world."<SEP>"Harry believes Dumbledore is keeping something safe that Snape is trying to steal."<SEP>"Harry learned that Dumbledore is involved in guarding something secret with Hagrid."<SEP>"Harry learns about Dumbledore through a Chocolate Frog card, discovering his significance in the wizarding world."<SEP>"Harry plans to send Hedwig to Dumbledore in case of trouble, indicating trust in the headmaster."<SEP>"Harry seeks Dumbledore's help regarding the threat to the Sorcerer's Stone."<SEP>"Harry seeks Dumbledore's help to stop the theft of the Philosopher's Stone, showing trust in his leadership."<SEP>"Harry seeks answers from Dumbledore about his past and the events surrounding the Philosopher's Stone."<SEP>"Harry trusts Dumbledore but sometimes questions his honesty, showing a complex mentor-student relationship."<SEP>"Harry trusts Dumbledore to protect him and the Stone from Voldemort, seeing him as a powerful ally."<SEP>"Harry trusts and admires Dumbledore, as seen in his vision in the Mirror of Erised."</data>
+    <data key="d6">chunk-e976947b68242b45dda38dfc476bbb1d<SEP>chunk-49cbcfff0c964735f173b8d56b6dbf8b<SEP>chunk-48c8774dc2b4920db3f0743c06de0f87<SEP>chunk-2d878134ff402f7d91a6b91f74933289<SEP>chunk-3230098c868daeaf5832d473dc638e24<SEP>chunk-dcf357ba6886dac19a1281224e4aa24f<SEP>chunk-743eba5e33b3d9c7286c1be9bb5c4df8<SEP>chunk-c98d87ff9192d5e9f811c3e40054b50d<SEP>chunk-14997594e026a24d0bc5279b5a1274d2<SEP>chunk-7294336b1b26ee03f70a09a2449d8525<SEP>chunk-28deebfd77bb67f0280ef9e7b84489af<SEP>chunk-4bab9cf02a37c76292d20d598408db9d<SEP>chunk-a576e748bf4e7c04ebb888446e2c9b88</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""DUMBLEDORE"" target=""PROFESSOR MCGONAGALL"">
+    <data key="d4">30.0</data>
+    <data key="d5">"Dumbledore and Professor McGonagall collaborate to ensure Harry's safety, showing a professional and caring relationship."<SEP>"Dumbledore and Professor McGonagall discuss and debate the best course of action for Harry's future."<SEP>"Professor McGonagall and Dumbledore discuss the events surrounding Voldemort's disappearance and the Potters' death, showing their close working relationship."<SEP>"Professor McGonagall plans to consult Dumbledore about bending the first-year rule for Harry to play Quidditch."</data>
+    <data key="d6">chunk-7ca033116898f2ab6ab1ad55dff849d7<SEP>chunk-3b06affd4457f7093c635f57d838af70<SEP>chunk-4f71dec2666d57aa25ee44feac190df3<SEP>chunk-7a990bf9b4fe3371f867beac09d47591</data>
+    <data key="d7">1</data>
+  </edge>
+  <edge source=""DUMBLEDORE"" target=""HAGRID"">
+    <data key="d4">60.0</data>
+    <data key="d5">"Dumbledore and Hagrid work together to deliver Harry to the Dursleys, showing a collaborative relationship."<SEP>"Dumbledore trusts Hagrid with the important task of transporting Harry Potter."<SEP>"Hagrid is expected by Dumbledore and is the one who informed Professor McGonagall about Dumbledore's location."<SEP>"Hagrid is trusted by Dumbledore and knows secrets about the Philosopher's Stone."<SEP>"Hagrid is trusted by Dumbledore to carry out important tasks, such as fetching Harry and visiting Gringotts."<SEP>"Hagrid is trusted by Dumbledore, showing their close relationship."<SEP>"Hagrid lent the three-headed dog to Dumbledore to guard something secret."<SEP>"Hagrid mentions that Dumbledore was offered the position of Minister of Magic but chose to stay at Hogwarts."</data>
+    <data key="d6">chunk-48c8774dc2b4920db3f0743c06de0f87<SEP>chunk-4f71dec2666d57aa25ee44feac190df3<SEP>chunk-00e69a515b0165e2668c9f6596183242<SEP>chunk-3b06affd4457f7093c635f57d838af70<SEP>chunk-7a990bf9b4fe3371f867beac09d47591<SEP>chunk-9f08343d4ce0077f159bdca2104fd9e6<SEP>chunk-9af8b4eef4a5930ccf2d732ecc0c8ed5<SEP>chunk-a576e748bf4e7c04ebb888446e2c9b88</data>
+    <data key="d7">1</data>
+  </edge>
+</graphml_extract>

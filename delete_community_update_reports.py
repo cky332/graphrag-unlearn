@@ -1,0 +1,127 @@
+import json
+import asyncio
+from dataclasses import asdict
+import os
+import sys
+
+from nano_graphrag.graphrag import GraphRAG
+from nano_graphrag._op import _pack_single_community_describe, _community_report_json_to_str
+from nano_graphrag.prompt import PROMPTS
+from delete_utils import get_logger, load_api_config
+
+logger = get_logger()
+
+OLD_REPORTS: dict = {}
+FORBID_ENTITY: str = ""
+
+load_api_config()
+
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+async def update_single_community_report(rag: GraphRAG, community_id: str):
+    """
+    仅更新 report_string 和 report_json，不修改其他字段（nodes, edges 等）。
+    在 prompt 中强制：
+      - 从输入中清洗掉所有与 FORBID_ENTITY 相关的数据
+      - 严格禁止输出中出现该实体及任何关联信息
+    """
+    global FORBID_ENTITY
+
+    community_report_kv = rag.community_reports
+    knowledge_graph_inst = rag.chunk_entity_relation_graph
+    global_config = asdict(rag)
+
+    all_schema = await knowledge_graph_inst.community_schema()
+    schema = all_schema.get(community_id)
+
+    old_data = OLD_REPORTS.get(community_id, {})
+
+    if not schema or not schema.get('nodes'):
+        new_data = {
+            **old_data,
+            'report_string': '',
+            'report_json': {}
+        }
+        await community_report_kv.upsert({community_id: new_data})
+        logger.info(f"INFO: 社区 {community_id} 节点为空，仅清空报告字段。")
+        return
+
+    describe = await _pack_single_community_describe(
+        knowledge_graph_inst,
+        schema,
+        max_token_size=global_config['best_model_max_token_size'],
+        already_reports={},
+        global_config=global_config,
+    )
+
+    forbid = FORBID_ENTITY
+    if forbid:
+        preamble = f"""
+IMPORTANT: You are given an 'Entities' section and a 'Relationships' section below.
+Before generating the report, you MUST perform the following CLEANING steps:
+  1. Remove any line in the Entities section where id == "{forbid}".
+  2. Remove any line in the Relationships section where source == "{forbid}" OR target == "{forbid}".
+After cleaning, you will ONLY use the remaining Entities and Relationships to generate the report.
+
+Then, follow these RULES EXACTLY:
+  - Do NOT mention, reference, or imply anything about "{forbid}".
+  - Do NOT include any content derived from "{forbid}" (directly or indirectly).
+  - If no entities remain after cleaning, output:
+      {{ "title": "", "summary": "", "findings": [], "recommendations": [] }}
+  - Your output must be ONE SINGLE valid JSON object, and nothing else.
+
+-----Begin Cleansed Input Below-----
+""".strip()
+
+        prompt_body = PROMPTS['community_report'].format(input_text=describe)
+        prompt = "\n\n".join([preamble, prompt_body])
+    else:
+        prompt = PROMPTS['community_report'].format(input_text=describe)
+
+    response = await rag.best_model_func(
+        prompt,
+        **rag.special_community_report_llm_kwargs
+    )
+
+    report_json = rag.convert_response_to_json_func(response)
+    report_string = _community_report_json_to_str(report_json)
+
+    new_data = {
+        **old_data,
+        'report_string': report_string,
+        'report_json': report_json
+    }
+    await community_report_kv.upsert({community_id: new_data})
+    print(f"INFO: 社区 {community_id} 报告字段已更新。")
+
+
+async def main(forbid_entity: str = ""):
+    """
+    forbid_entity：要禁止在报告中出现的实体名称，通常传入 raw_node_id。
+    """
+    global OLD_REPORTS, FORBID_ENTITY
+    FORBID_ENTITY = forbid_entity
+
+    with open('deleted_clusters_cache.json', 'r', encoding='utf-8') as f:
+        deleted_clusters = json.load(f)
+
+    rag = GraphRAG(working_dir='cache')
+
+    await rag.community_reports.index_start_callback()
+    await rag.chunk_entity_relation_graph.index_start_callback()
+
+    reports_path = os.path.join(rag.working_dir, 'kv_store_community_reports.json')
+    with open(reports_path, 'r', encoding='utf-8') as f:
+        OLD_REPORTS = json.load(f)
+
+    for community_id in deleted_clusters:
+        await update_single_community_report(rag, community_id)
+
+    await rag.community_reports.index_done_callback()
+    await rag.chunk_entity_relation_graph.index_done_callback()
+
+
+if __name__ == '__main__':
+    forbid = sys.argv[1] if len(sys.argv) > 1 else ""
+    asyncio.run(main(forbid))
